@@ -390,10 +390,12 @@ function updateBooking($bookingId, $updates) {
  */
 function sendBookingReceivedEmail($bookingData) {
     $property = PROPERTIES[$bookingData['property']] ?? ['name' => 'Unknown Property'];
+    $firstName = $bookingData['first_name'] ?? '';
+    $lastName = $bookingData['last_name'] ?? '';
     
     $message = "
     <h2>Booking Received - Payment Processing</h2>
-    <p>Hello {$bookingData['firstName']} {$bookingData['lastName']},</p>
+    <p>Hello {$firstName} {$lastName},</p>
     <p>Thank you for booking <strong>{$property['name']}</strong>! We have received your booking request and are processing your payment.</p>
     
     <h3>Booking Details</h3>
