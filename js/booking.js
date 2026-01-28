@@ -64,6 +64,16 @@ function hideErrorMessage() {
 }
 
 /**
+ * Hide booking form when invalid parameters
+ */
+function hideBookingForm() {
+    const bookingForm = document.getElementById('bookingForm');
+    const bookingSidebar = document.querySelector('.booking-sidebar');
+    if (bookingForm) bookingForm.style.display = 'none';
+    if (bookingSidebar) bookingSidebar.style.display = 'none';
+}
+
+/**
  * Initialize booking page
  */
 document.addEventListener('DOMContentLoaded', async function() {
@@ -72,10 +82,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     const propertyId = urlParams.get('property');
     const checkIn = urlParams.get('checkIn');
     const checkOut = urlParams.get('checkOut');
-    const guests = urlParams.get('guests') || '2';
+    const guests = urlParams.get('guests');
     
-    // Validate property
-    if (!propertyId || !PROPERTIES[propertyId]) {
+    // Validate all required parameters
+    if (!propertyId || !checkIn || !checkOut || !guests) {
+        hideBookingForm();
+        showErrorMessage('Missing booking information. Please select your dates and property to book.');
+        setTimeout(() => {
+            window.location.href = 'properties.html';
+        }, 3000);
+        return;
+    }
+    
+    // Validate property exists
+    if (!PROPERTIES[propertyId]) {
+        hideBookingForm();
         showErrorMessage('Invalid property selection. Redirecting to properties...');
         setTimeout(() => {
             window.location.href = 'properties.html';
@@ -83,20 +104,62 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
     
+    // Validate dates are valid
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+    
+    if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
+        hideBookingForm();
+        showErrorMessage('Invalid dates provided. Please select valid check-in and check-out dates.');
+        setTimeout(() => {
+            window.location.href = 'properties.html';
+        }, 3000);
+        return;
+    }
+    
+    // Validate check-out is after check-in
+    if (checkOutDate <= checkInDate) {
+        hideBookingForm();
+        showErrorMessage('Check-out date must be after check-in date. Please select valid dates.');
+        setTimeout(() => {
+            window.location.href = 'properties.html';
+        }, 3000);
+        return;
+    }
+    
+    // Validate dates are not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (checkInDate < today) {
+        hideBookingForm();
+        showErrorMessage('Cannot book dates in the past. Please select future dates.');
+        setTimeout(() => {
+            window.location.href = 'properties.html';
+        }, 3000);
+        return;
+    }
+    
+    // Validate guests is a valid number
+    const guestsNum = parseInt(guests);
+    if (isNaN(guestsNum) || guestsNum < 1 || guestsNum > 6) {
+        hideBookingForm();
+        showErrorMessage('Invalid number of guests. Please select between 1 and 6 guests.');
+        setTimeout(() => {
+            window.location.href = 'properties.html';
+        }, 3000);
+        return;
+    }
+    
     // Set booking data
     bookingData.property = propertyId;
     bookingData.checkIn = checkIn;
     bookingData.checkOut = checkOut;
-    bookingData.guests = parseInt(guests);
+    bookingData.guests = guestsNum;
     bookingData.nightlyRate = PROPERTIES[propertyId].nightlyRate;
     bookingData.cleaningFee = PROPERTIES[propertyId].cleaningFee;
     
     // Calculate nights
-    if (checkIn && checkOut) {
-        const checkInDate = new Date(checkIn);
-        const checkOutDate = new Date(checkOut);
-        bookingData.nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
-    }
+    bookingData.nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
     
     // Display property and booking info
     displayPropertyInfo();

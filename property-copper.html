@@ -267,8 +267,8 @@
 
                         <div class="selected-dates-message" id="selectedDates-copper-sidebar" style="display: none;">
                             <p style="margin: 1rem 0; padding: 1rem; background: #e8f4f8; border-radius: 4px; color: #333; font-size: 0.9rem;">
-                                ✓ Check-in: <strong id="checkInDisplay-copper-sidebar"></strong><br>
-                                ✓ Check-out: <strong id="checkOutDisplay-copper-sidebar"></strong>
+                                Check-in: <strong id="checkInDisplay-copper-sidebar"></strong><br>
+                                Check-out: <strong id="checkOutDisplay-copper-sidebar"></strong>
                             </p>
                         </div>
 
@@ -278,11 +278,7 @@
                             </p>
                         </div>
 
-                        <button class="btn btn-primary btn-large" id="bookBtn-copper-sidebar" onclick="bookPropertyWithDates('copper', selectedDates.copper.checkIn, selectedDates.copper.checkOut, 1)" disabled>
-                            Book Now
-                        </button>
-
-                        <div class="pricing-breakdown">
+                        <div class="pricing-breakdown" id="pricingBreakdown-copper" style="display: none;">
                             <div class="pricing-row">
                                 <span>$150 × <span id="nightsCount">0</span> nights</span>
                                 <span id="nightsTotal">$0</span>
@@ -301,7 +297,13 @@
                             </div>
                         </div>
 
-                        <p class="no-charge-yet">You won't be charged yet</p>
+                        <p class="no-charge-yet" id="noCharge-copper" style="display: none;">You won't be charged yet</p>
+
+                        <div style="text-align: right; margin-top: 1rem;">
+                            <button class="btn btn-primary btn-large" id="bookBtn-copper-sidebar" onclick="bookPropertyWithDates('copper', selectedDates.copper.checkIn, selectedDates.copper.checkOut, 1)" disabled>
+                                Book Now
+                            </button>
+                        </div>
                     </div>
 
                     <div class="contact-host-card">

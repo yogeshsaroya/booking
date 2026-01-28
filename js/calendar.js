@@ -317,6 +317,9 @@ function updateCalendarSelection(propertyId) {
     const sidebarCheckOutDisplay = document.getElementById(`checkOutDisplay-${propertyId}-sidebar`);
     const sidebarError = document.getElementById(`errorMessage-${propertyId}-sidebar`);
     
+    const pricingBreakdown = document.getElementById(`pricingBreakdown-${propertyId}`);
+    const noChargeNote = document.getElementById(`noCharge-${propertyId}`);
+
     if (!dates.checkIn) {
         // Hide success message and disable button
         // Keep error message visible if it's showing
@@ -324,6 +327,9 @@ function updateCalendarSelection(propertyId) {
         if (bookBtn) bookBtn.disabled = true;
         if (sidebarMessage) sidebarMessage.style.display = 'none';
         if (sidebarBookBtn) sidebarBookBtn.disabled = true;
+
+        if (pricingBreakdown) pricingBreakdown.style.display = 'none';
+        if (noChargeNote) noChargeNote.style.display = 'none';
         return;
     }
     
@@ -370,12 +376,33 @@ function updateCalendarSelection(propertyId) {
             sidebarBookBtn.disabled = false;
             if (sidebarError) sidebarError.style.display = 'none';
         }
+
+        if (pricingBreakdown) pricingBreakdown.style.display = 'block';
+        if (noChargeNote) noChargeNote.style.display = 'block';
+
+        if (typeof window.updatePropertyPricingFromDates === 'function') {
+            window.updatePropertyPricingFromDates(propertyId, dates.checkIn, dates.checkOut);
+        }
     } else if (dates.checkIn) {
         // Only check-in selected, hide message but keep button disabled
         if (messageDiv) messageDiv.style.display = 'none';
         if (bookBtn) bookBtn.disabled = true;
         if (sidebarMessage) sidebarMessage.style.display = 'none';
         if (sidebarBookBtn) sidebarBookBtn.disabled = true;
+
+        if (pricingBreakdown) pricingBreakdown.style.display = 'none';
+        if (noChargeNote) noChargeNote.style.display = 'none';
+
+        if (typeof window.updatePropertyPricingFromDates === 'function') {
+            window.updatePropertyPricingFromDates(propertyId, null, null);
+        }
+    } else {
+        if (typeof window.updatePropertyPricingFromDates === 'function') {
+            window.updatePropertyPricingFromDates(propertyId, null, null);
+        }
+
+        if (pricingBreakdown) pricingBreakdown.style.display = 'none';
+        if (noChargeNote) noChargeNote.style.display = 'none';
     }
 }
 

@@ -112,6 +112,35 @@ function updatePricing(nights, nightsTotal, total = 0) {
 }
 
 /**
+ * Update pricing from calendar date selection
+ */
+window.updatePropertyPricingFromDates = function(propertyId, checkIn, checkOut) {
+    if (!checkIn || !checkOut) {
+        updatePricing(0, 0);
+        return;
+    }
+
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+
+    if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
+        updatePricing(0, 0);
+        return;
+    }
+
+    if (checkOutDate <= checkInDate) {
+        updatePricing(0, 0);
+        return;
+    }
+
+    const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+    const nightsTotal = NIGHTLY_RATE * nights;
+    const total = nightsTotal + CLEANING_FEE + SERVICE_FEE;
+
+    updatePricing(nights, nightsTotal, total);
+};
+
+/**
  * Update guests display (for future use if needed)
  */
 function updateGuestsDisplay(event) {

@@ -40,6 +40,10 @@
                 <div class="booking-details">
                     <h1>Complete Your Booking</h1>
                     
+                    <div class="error-message" id="bookingErrorMessage" style="display: none; margin-bottom: 2rem;">
+                        <p id="bookingErrorText"></p>
+                    </div>
+                    
                     <div class="property-summary" id="propertySummary">
                         <!-- Populated by JavaScript -->
                     </div>
@@ -153,10 +157,6 @@
                                 <input type="checkbox" name="agreeTerms" required>
                                 I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Cancellation Policy</a>
                             </label>
-                        </div>
-
-                        <div class="error-message" id="bookingErrorMessage" style="display: none;">
-                            <p id="bookingErrorText"></p>
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-large" id="submitBtn">
