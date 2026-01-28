@@ -2,7 +2,7 @@
 /**
  * SmartStayz Payment Verification Cron Job
  * Verifies pending payments against Stripe to catch any missed webhooks
- * Run this via cron job every 5-10 minutes: */5 * * * * php /path/to/verify-pending-payments.php
+ * Run this via cron job every 5-10 minutes: * /5 * * * * php /path/to/verify-pending-payments.php
  */
 
 require_once 'config.php';
