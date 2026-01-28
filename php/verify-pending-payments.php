@@ -182,29 +182,35 @@ function sendConfirmationEmail($bookingData) {
     $propertyName = is_array($property) ? $property['name'] : $property;
     $firstName = $bookingData['first_name'] ?? '';
     $lastName = $bookingData['last_name'] ?? '';
+    $bookingId = $bookingData['booking_id'] ?? '';
     $checkIn = $bookingData['check_in'] ?? '';
     $checkOut = $bookingData['check_out'] ?? '';
     
     $emailBody = "
-        <h2>Booking Confirmed!</h2>
+        <h2>✅ Payment Confirmed - Booking Complete!</h2>
         <p>Hello {$firstName} {$lastName},</p>
-        <p>Your booking for <strong>{$propertyName}</strong> has been confirmed.</p>
+        <p><strong>Great news!</strong> Your payment has been successfully processed and your booking is now confirmed.</p>
         
         <h3>Booking Details</h3>
         <ul>
+            <li><strong>Booking ID:</strong> {$bookingId}</li>
+            <li><strong>Property:</strong> {$propertyName}</li>
             <li><strong>Check-in:</strong> {$checkIn}</li>
             <li><strong>Check-out:</strong> {$checkOut}</li>
             <li><strong>Guests:</strong> {$bookingData['guests']}</li>
-            <li><strong>Total Amount:</strong> \${$bookingData['amount']}</li>
+            <li><strong>Total Amount Paid:</strong> \${$bookingData['amount']}</li>
         </ul>
         
-        <p>Further instructions will be sent shortly.</p>
+        <p><strong>What's Next?</strong></p>
+        <p>You will receive check-in instructions 24-48 hours before your arrival. If you have any questions or special requests, please contact us.</p>
+        
+        <p>We look forward to hosting you!</p>
         <p>Best regards,<br>SmartStayz Team</p>
     ";
     
     $mailHandler->send(
         $bookingData['email'],
-        "Booking Confirmed - {$propertyName}",
+        "Payment Confirmed - {$propertyName}",
         $emailBody
     );
 }
