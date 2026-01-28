@@ -270,6 +270,7 @@ function validateBookingData($data) {
 function isDateRangeAvailable($propertyId, $checkIn, $checkOut) {
     // Get blocked dates from calendar
     $ch = curl_init("http://{$_SERVER['HTTP_HOST']}/php/calendar-sync.php?property=$propertyId");
+    
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
     curl_close($ch);

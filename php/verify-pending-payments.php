@@ -87,7 +87,6 @@ try {
                 updateBooking($bookingId, [
                     'status' => 'confirmed',
                     'stripe_payment_intent' => $paymentIntentId,
-                    'confirmed_at' => date('Y-m-d H:i:s'),
                     'verification_method' => 'cron_job'
                 ]);
                 
@@ -176,19 +175,25 @@ function updateBooking($bookingId, $updates) {
  */
 function sendConfirmationEmail($bookingData) {
     require_once 'MailHandler.php';
+    require_once 'config.php';
     
     $mailHandler = new MailHandler();
-    $property = $bookingData['property'] ?? 'Unknown';
+    $property = PROPERTIES[$bookingData['property']] ?? ['name' => 'Unknown Property'];
+    $propertyName = is_array($property) ? $property['name'] : $property;
+    $firstName = $bookingData['first_name'] ?? '';
+    $lastName = $bookingData['last_name'] ?? '';
+    $checkIn = $bookingData['check_in'] ?? '';
+    $checkOut = $bookingData['check_out'] ?? '';
     
     $emailBody = "
         <h2>Booking Confirmed!</h2>
-        <p>Hello {$bookingData['firstName']} {$bookingData['lastName']},</p>
-        <p>Your booking for <strong>{$property}</strong> has been confirmed.</p>
+        <p>Hello {$firstName} {$lastName},</p>
+        <p>Your booking for <strong>{$propertyName}</strong> has been confirmed.</p>
         
         <h3>Booking Details</h3>
         <ul>
-            <li><strong>Check-in:</strong> {$bookingData['checkIn']}</li>
-            <li><strong>Check-out:</strong> {$bookingData['checkOut']}</li>
+            <li><strong>Check-in:</strong> {$checkIn}</li>
+            <li><strong>Check-out:</strong> {$checkOut}</li>
             <li><strong>Guests:</strong> {$bookingData['guests']}</li>
             <li><strong>Total Amount:</strong> \${$bookingData['amount']}</li>
         </ul>
@@ -197,10 +202,9 @@ function sendConfirmationEmail($bookingData) {
         <p>Best regards,<br>SmartStayz Team</p>
     ";
     
-    $mailHandler->sendEmail(
+    $mailHandler->send(
         $bookingData['email'],
-        "{$bookingData['firstName']} {$bookingData['lastName']}",
-        "Booking Confirmed - {$property}",
+        "Booking Confirmed - {$propertyName}",
         $emailBody
     );
 }
