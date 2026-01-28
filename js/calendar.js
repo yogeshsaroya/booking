@@ -231,7 +231,7 @@ function handleDayClick(propertyId, dateString) {
                 
                 // Ask if user wants to book
                 if (confirm(`Book from ${dates.checkIn} to ${dates.checkOut}?`)) {
-                    bookProperty(propertyId);
+                    bookPropertyWithDates(propertyId, dates.checkIn, dates.checkOut);
                 }
             } else {
                 alert('There are booked dates in your selected range. Please choose different dates.');
@@ -318,9 +318,15 @@ window.highlightDateRange = function(checkIn, checkOut) {
 };
 
 /**
- * Refresh calendar data every 30 minutes
+ * Book property with specific dates from calendar selection
  */
-setInterval(() => {
+function bookPropertyWithDates(propertyId, checkIn, checkOut) {
+    const guests = document.getElementById('guests')?.value || '1';
+    const url = `booking.html?property=${propertyId}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`;
+    window.location.href = url;
+}
+
+/**
     Object.keys(PROPERTY_ICAL_URLS).forEach(propertyId => {
         loadCalendarData(propertyId);
     });
