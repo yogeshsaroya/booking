@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Properties - SmartStayz Hyde Park Rentals</title>
+    <meta name="description" content="Browse our three boutique Hyde Park vacation rentals. Check availability and book your perfect Tampa stay.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/calendar.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Karla:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">SmartStayz</a>
+            <ul class="nav-menu">
+                <li><a href="properties.html">Properties</a></li>
+                <li><a href="index.html#amenities">Amenities</a></li>
+                <li><a href="index.html#location">Location</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Our Properties</h1>
+            <p>Three unique spaces in the heart of Hyde Park</p>
+        </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="checkIn">Check-in</label>
+                    <input type="date" id="checkIn" name="checkIn">
+                </div>
+                <div class="filter-group">
+                    <label for="checkOut">Check-out</label>
+                    <input type="date" id="checkOut" name="checkOut">
+                </div>
+                <div class="filter-group">
+                    <label for="guests">Guests</label>
+                    <select id="guests" name="guests">
+                        <option value="1">1 guest</option>
+                        <option value="2">2 guests</option>
+                        <option value="3">3 guests</option>
+                        <option value="4">4 guests</option>
+                        <option value="5">5 guests</option>
+                        <option value="6">6 guests</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="searchBtn">Check Availability</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Properties Listing -->
+    <section class="properties-listing">
+        <div class="container">
+            
+            <!-- The Stone Property -->
+            <article class="property-detail-card" data-property-id="stone">
+                <div class="property-images">
+                    
+                    <div class="main-image">
+                        <img src="images/airbnb-photos/stone/01-hero.jpg" alt="The Stone Main Image">
+                    </div>
+                    <div class="image-gallery">
+                        <div class="thumb-image"><img src="images/airbnb-photos/stone/02-interior.jpg" alt="The Stone Interior"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/stone/03-interior.jpg" alt="The Stone Interior"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/stone/03-interior.jpg" alt="The Stone Interior"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/stone/04-living.jpg" alt="The Stone Living Room"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/stone/05-kitchen.jpg" alt="The Stone Kitchen"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/stone/06-bedroom1.jpg" alt="The Stone Bedroom 1"></div>
+                    </div>
+                </div>
+                <div class="property-info">
+                    <div class="property-header">
+                        <div>
+                            <h2>The Stone</h2>
+                            <p class="property-subtitle">Exquisite Urban-Industrial Stay</p>
+                            <div class="rating">★ 4.98 · 631 reviews · Superhost</div>
+                        </div>
+                        <div class="airbnb-link">
+                            <a href="https://www.airbnb.com/rooms/42680597" target="_blank" class="btn btn-outline">View on Airbnb</a>
+                        </div>
+                    </div>
+                    
+                    <div class="property-specs">
+                        <span>2 bedrooms</span>
+                        <span>·</span>
+                        <span>3 beds</span>
+                        <span>·</span>
+                        <span>1 bath</span>
+                        <span>·</span>
+                        <span>6 guests</span>
+                    </div>
+
+                    <div class="property-description">
+                        <p>One-of-a-kind boutique apartment just 3 blocks from SoHo & Hyde Park Village. Artfully designed with natural stone and custom elements. King bed, private parking, fenced backyard perfect for pets.</p>
+                    </div>
+
+                    <div class="property-highlights">
+                        <h3>Highlights</h3>
+                        <ul>
+                            <li>✓ Full coffee bar with espresso machine</li>
+                            <li>✓ Private off-street parking & fenced backyard</li>
+                            <li>✓ 55" TV with sound bar & subwoofer</li>
+                            <li>✓ Pets welcome - no extra fee</li>
+                            <li>✓ Self check-in with keypad</li>
+                            <li>✓ Top 5% of homes based on ratings</li>
+                        </ul>
+                    </div>
+
+                    <div class="availability-calendar" id="calendar-stone">
+                        <h3>Availability Calendar</h3>
+                        <div class="calendar-container">
+                            <div class="calendar-loading">Loading availability...</div>
+                        </div>
+                    </div>
+
+                    <div class="booking-action">
+                        <button class="btn btn-primary btn-large" onclick="bookProperty('stone')">Book Now</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- The Copper Property -->
+            <article class="property-detail-card" data-property-id="copper">
+                <div class="property-images">
+                    <div class="main-image">
+                        <img src="images/airbnb-photos/copper/01-hero.jpg" alt="The Copper Main Image">
+                    </div>
+                    <div class="image-gallery">
+                        <div class="thumb-image"><img src="images/airbnb-photos/copper/02-interior.jpg" alt="The Copper Interior"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/copper/03-interior.jpg" alt="The Copper Interior"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/copper/04-living.jpg" alt="The Copper Living Room"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/copper/05-kitchen.jpg" alt="The Copper Kitchen"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/copper/06-bedroom1.jpg" alt="The Copper Bedroom 1"></div>
+                    </div>
+                </div>
+                <div class="property-info">
+                    <div class="property-header">
+                        <div>
+                            <h2>The Copper</h2>
+                            <p class="property-subtitle">Vibrant Maximalist Retreat</p>
+                            <div class="rating">★ 4.97 · Contact for reviews · Superhost</div>
+                        </div>
+                        <div class="airbnb-link">
+                            <a href="https://www.airbnb.co.in/rooms/44434858" target="_blank" class="btn btn-outline">View on Airbnb</a>
+                        </div>
+                    </div>
+                    
+                    <div class="property-specs">
+                        <span>2 bedrooms</span>
+                        <span>·</span>
+                        <span>3 beds</span>
+                        <span>·</span>
+                        <span>1 bath</span>
+                        <span>·</span>
+                        <span>6 guests</span>
+                    </div>
+
+                    <div class="property-description">
+                        <p>Bold and beautiful boutique space with rich copper accents and maximalist design. Features premium entertainment system, private parking, and welcoming backyard oasis for your furry friends.</p>
+                    </div>
+
+                    <div class="property-highlights">
+                        <h3>Highlights</h3>
+                        <ul>
+                            <li>✓ Unique maximalist interior design</li>
+                            <li>✓ Private parking & backyard oasis</li>
+                            <li>✓ Premium entertainment system</li>
+                            <li>✓ Pet-friendly with no additional fees</li>
+                            <li>✓ Walking distance to SoHo & Hyde Park</li>
+                            <li>✓ Self check-in convenience</li>
+                        </ul>
+                    </div>
+
+                    <div class="availability-calendar" id="calendar-copper">
+                        <h3>Availability Calendar</h3>
+                        <div class="calendar-container">
+                            <div class="calendar-loading">Loading availability...</div>
+                        </div>
+                    </div>
+
+                    <div class="booking-action">
+                        <button class="btn btn-primary btn-large" onclick="bookProperty('copper')">Book Now</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- The Cedar Property -->
+            <article class="property-detail-card" data-property-id="cedar">
+                <div class="property-images">
+                    
+                    <div class="main-image">
+                        <img src="images/airbnb-photos/cedar/01-hero.jpg" alt="The Cedar Main Image">
+                    </div>
+                    <div class="image-gallery">
+                        <div class="thumb-image"><img src="images/airbnb-photos/cedar/02-interior.jpg" alt="The Cedar Interior"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/cedar/03-kitchen.jpg" alt="The Cedar Interior"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/cedar/04-bedroom1.jpg" alt="The Cedar Living Room"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/cedar/05-bathroom.jpg" alt="The Cedar Living Room"></div>
+                        <div class="thumb-image"><img src="images/airbnb-photos/cedar/06-bedroom2.jpg" alt="The Cedar Living Room"></div>
+                    </div>
+                </div>
+                <div class="property-info">
+                    <div class="property-header">
+                        <div>
+                            <h2>The Cedar</h2>
+                            <p class="property-subtitle">Rustic-Chic Hyde Park Haven</p>
+                            <div class="rating">★ 4.97 · 592 reviews · Superhost</div>
+                        </div>
+                        <div class="airbnb-link">
+                            <a href="https://www.airbnb.com/rooms/40961787" target="_blank" class="btn btn-outline">View on Airbnb</a>
+                        </div>
+                    </div>
+                    
+                    <div class="property-specs">
+                        <span>2 bedrooms</span>
+                        <span>·</span>
+                        <span>3 beds</span>
+                        <span>·</span>
+                        <span>1 bath</span>
+                        <span>·</span>
+                        <span>6 guests</span>
+                    </div>
+
+                    <div class="property-description">
+                        <p>Handcrafted rustic-chic apartment featuring natural cedar, quartzite stone, and thoughtful design. Includes 12-inch rainfall shower, 55" TV with soundbar, private parking and fenced backyard.</p>
+                    </div>
+
+                    <div class="property-highlights">
+                        <h3>Highlights</h3>
+                        <ul>
+                            <li>✓ Quartzite stone & real cedar finishes</li>
+                            <li>✓ 12" rainfall showerhead experience</li>
+                            <li>✓ 55" TV with soundbar & subwoofer</li>
+                            <li>✓ Private parking & fenced backyard</li>
+                            <li>✓ Pets welcome at no extra charge</li>
+                            <li>✓ Top 5% of homes - Guest Favorite</li>
+                        </ul>
+                    </div>
+
+                    <div class="availability-calendar" id="calendar-cedar">
+                        <h3>Availability Calendar</h3>
+                        <div class="calendar-container">
+                            <div class="calendar-loading">Loading availability...</div>
+                        </div>
+                    </div>
+
+                    <div class="booking-action">
+                        <button class="btn btn-primary btn-large" onclick="bookProperty('cedar')">Book Now</button>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>SmartStayz</h4>
+                    <p>Boutique short-term rentals in Hyde Park, Tampa's premier neighborhood.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Properties</h4>
+                    <ul>
+                        <li><a href="#stone">The Stone</a></li>
+                        <li><a href="#copper">The Copper</a></li>
+                        <li><a href="#cedar">The Cedar</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="index.html#contact">Contact Us</a></li>
+                        <li><a href="https://www.airbnb.com/users/show/db956adc-5e6e-44c1-9e55-2ead83e4a3be" target="_blank">Airbnb Profile</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SmartStayz, LLC. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/calendar.js"></script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+/* ==========================================================================
+   Calendar and Properties Page Styles
+   ========================================================================== */
+
+/* Page Header */
+.page-header {
+    margin-top: 80px;
+    padding: var(--spacing-xl) 0 var(--spacing-lg);
+    text-align: center;
+    background: linear-gradient(135deg, var(--soft-cream) 0%, var(--warm-white) 100%);
+}
+
+.page-header h1 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    color: var(--stone-gray);
+}
+
+/* Filters Section */
+.filters-section {
+    padding: var(--spacing-md) 0;
+    background: var(--warm-white);
+    border-bottom: 1px solid rgba(107, 100, 89, 0.1);
+    position: sticky;
+    top: 80px;
+    z-index: 100;
+}
+
+.filters {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 180px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--deep-earth);
+}
+
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid rgba(107, 100, 89, 0.2);
+    border-radius: 2px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    background: var(--warm-white);
+    transition: var(--transition-quick);
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--copper-accent);
+    box-shadow: 0 0 0 3px rgba(166, 115, 82, 0.1);
+}
+
+/* Properties Listing */
+.properties-listing {
+    padding: var(--spacing-lg) 0;
+}
+
+.property-detail-card {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: var(--soft-cream);
+    border-radius: 4px;
+    border: 1px solid rgba(107, 100, 89, 0.1);
+}
+.property-images .main-image img, .property-images .thumb-image img {
+    object-fit: contain;
+    width: 100%;
+}
+.property-images {
+    position: sticky;
+    top: 180px;
+    height: fit-content;
+}
+
+.main-image {
+    width: 100%;
+    height: 400px;
+    margin-bottom: var(--spacing-sm);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.thumb-image {
+    height: 120px;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition-quick);
+}
+
+.thumb-image:hover {
+    opacity: 0.8;
+    transform: scale(0.98);
+}
+
+.property-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.property-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid rgba(107, 100, 89, 0.1);
+}
+
+.property-header h2 {
+    margin-bottom: 0.25rem;
+}
+
+.property-subtitle {
+    font-size: 1rem;
+    color: var(--stone-gray);
+    font-style: italic;
+    margin-bottom: 0.5rem;
+}
+
+.rating {
+    font-size: 0.9rem;
+    color: var(--stone-gray);
+}
+
+.property-specs {
+    font-size: 0.95rem;
+    color: var(--stone-gray);
+}
+
+.property-description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--deep-earth);
+}
+
+.property-highlights h3 {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.property-highlights ul {
+    list-style: none;
+}
+
+.property-highlights li {
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    color: var(--deep-earth);
+}
+
+/* Calendar Styles */
+.availability-calendar {
+    padding: var(--spacing-md);
+    background: var(--warm-white);
+    border-radius: 4px;
+    border: 1px solid rgba(107, 100, 89, 0.1);
+}
+
+.availability-calendar h3 {
+    margin-bottom: var(--spacing-md);
+}
+
+.calendar-container {
+    min-height: 300px;
+}
+
+.calendar-loading {
+    text-align: center;
+    padding: var(--spacing-lg);
+    color: var(--stone-gray);
+}
+
+.calendar {
+    width: 100%;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.calendar-nav {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.calendar-nav button {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--copper-accent);
+    color: var(--copper-accent);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: var(--transition-quick);
+}
+
+.calendar-nav button:hover {
+    background: var(--copper-accent);
+    color: var(--warm-white);
+}
+
+.calendar-month {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.calendar-day-header {
+    padding: 0.75rem;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--stone-gray);
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    padding: 0.5rem;
+    text-align: center;
+    border: 1px solid rgba(107, 100, 89, 0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: var(--transition-quick);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--warm-white);
+}
+
+.calendar-day:hover:not(.unavailable):not(.past) {
+    background: var(--soft-cream);
+    border-color: var(--copper-accent);
+}
+
+.calendar-day.unavailable {
+    background: repeating-linear-gradient(
+        45deg,
+        #f0ede8,
+        #f0ede8 5px,
+        #e5e0d9 5px,
+        #e5e0d9 10px
+    );
+    color: var(--stone-gray);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.calendar-day.past {
+    color: rgba(107, 100, 89, 0.3);
+    cursor: not-allowed;
+}
+
+.calendar-day.selected {
+    background: var(--copper-accent);
+    color: var(--warm-white);
+    border-color: var(--copper-accent);
+}
+
+.calendar-day.in-range {
+    background: rgba(166, 115, 82, 0.2);
+    border-color: var(--copper-accent);
+}
+
+.calendar-legend {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid rgba(107, 100, 89, 0.1);
+    font-size: 0.85rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    border: 1px solid rgba(107, 100, 89, 0.2);
+}
+
+.legend-box.available {
+    background: var(--warm-white);
+}
+
+.legend-box.unavailable {
+    background: repeating-linear-gradient(
+        45deg,
+        #f0ede8,
+        #f0ede8 3px,
+        #e5e0d9 3px,
+        #e5e0d9 6px
+    );
+}
+
+.legend-box.selected {
+    background: var(--copper-accent);
+}
+
+/* Booking Action */
+.booking-action {
+    padding: var(--spacing-md);
+    background: linear-gradient(135deg, rgba(139, 111, 71, 0.05) 0%, rgba(166, 115, 82, 0.05) 100%);
+    border-radius: 4px;
+    text-align: center;
+}
+
+.booking-action .btn {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .property-detail-card {
+        grid-template-columns: 1fr;
+    }
+    
+    .property-images {
+        position: relative;
+        top: 0;
+    }
+    
+    .main-image {
+        height: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .property-header {
+        flex-direction: column;
+    }
+    
+    .airbnb-link {
+        width: 100%;
+    }
+    
+    .airbnb-link .btn {
+        width: 100%;
+    }
+    
+    .main-image {
+        height: 300px;
+    }
+    
+    .thumb-image {
+        height: 80px;
+    }
+    
+    .calendar-grid {
+        gap: 1px;
+    }
+    
+    .calendar-day {
+        font-size: 0.85rem;
+        padding: 0.25rem;
+    }
+    
+    .calendar-legend {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+}

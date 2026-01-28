@@ -1,0 +1,16 @@
+{
+    "name": "smartstayz/booking-website",
+    "description": "SmartStayz Booking Website with Airbnb Calendar Sync",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "stripe/stripe-php": "^13.0"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php -r \"if (!file_exists('php/cache')) mkdir('php/cache', 0755, true);\"",
+            "@php -r \"if (!file_exists('php/logs')) mkdir('php/logs', 0755, true);\"",
+            "@php -r \"if (!file_exists('php/bookings')) mkdir('php/bookings', 0755, true);\""
+        ]
+    }
+}

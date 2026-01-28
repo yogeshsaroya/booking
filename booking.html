@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Booking - SmartStayz</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/booking.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Karla:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">SmartStayz</a>
+            <ul class="nav-menu">
+                <li><a href="properties.html">Properties</a></li>
+                <li><a href="index.html#amenities">Amenities</a></li>
+                <li><a href="index.html#location">Location</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Booking Section -->
+    <section class="booking-section">
+        <div class="container">
+            <div class="booking-grid">
+                
+                <!-- Booking Details -->
+                <div class="booking-details">
+                    <h1>Complete Your Booking</h1>
+                    
+                    <div class="property-summary" id="propertySummary">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <form id="bookingForm" class="booking-form">
+                        <h2>Guest Information</h2>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name *</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="guests">Number of Guests *</label>
+                            <select id="guests" name="guests" required>
+                                <option value="1">1 guest</option>
+                                <option value="2">2 guests</option>
+                                <option value="3">3 guests</option>
+                                <option value="4">4 guests</option>
+                                <option value="5">5 guests</option>
+                                <option value="6">6 guests</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="hasPets" id="hasPets">
+                                I will be bringing pets
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="specialRequests">Special Requests (Optional)</label>
+                            <textarea id="specialRequests" name="specialRequests" rows="4" 
+                                placeholder="Early check-in, dietary restrictions, etc."></textarea>
+                        </div>
+
+                        <h2>Payment Method</h2>
+                        
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="stripe" checked>
+                                <span class="payment-label">
+                                    <strong>Credit/Debit Card</strong>
+                                    <small>Secure payment via Stripe</small>
+                                </span>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="bitcoin">
+                                <span class="payment-label">
+                                    <strong>Bitcoin (₿)</strong>
+                                    <small>Zero fees - BTCPay Server</small>
+                                </span>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="venmo">
+                                <span class="payment-label">
+                                    <strong>Venmo / CashApp</strong>
+                                    <small>Manual payment - we'll send details</small>
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Credit Card Payment (Stripe) -->
+                        <div id="stripePayment" class="payment-section">
+                            <div class="form-group">
+                                <label>Card Information</label>
+                                <div id="card-element" class="stripe-element">
+                                    <!-- Stripe card element goes here -->
+                                </div>
+                                <div id="card-errors" class="error-message"></div>
+                            </div>
+                        </div>
+
+                        <!-- Bitcoin Payment -->
+                        <div id="bitcoinPayment" class="payment-section" style="display: none;">
+                            <div class="bitcoin-info">
+                                <p>After submitting your booking, you'll receive Bitcoin payment instructions via email.</p>
+                                <p class="highlight-text">✓ Zero processing fees<br>✓ Instant confirmation once payment received</p>
+                            </div>
+                        </div>
+
+                        <!-- Venmo/CashApp Payment -->
+                        <div id="venmoPayment" class="payment-section" style="display: none;">
+                            <div class="venmo-info">
+                                <p>After submitting your booking, we'll send you payment details via email.</p>
+                                <p class="small-text">Please note: Booking is not confirmed until payment is received and verified.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" name="agreeTerms" required>
+                                I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Cancellation Policy</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large" id="submitBtn">
+                            Complete Booking
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Booking Summary -->
+                <div class="booking-sidebar">
+                    <div class="booking-summary-card">
+                        <h3>Booking Summary</h3>
+                        
+                        <div class="summary-item" id="propertyInfo">
+                            <!-- Populated by JavaScript -->
+                        </div>
+
+                        <div class="summary-section">
+                            <div class="summary-row">
+                                <span>Check-in</span>
+                                <span id="summaryCheckIn">-</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Check-out</span>
+                                <span id="summaryCheckOut">-</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Nights</span>
+                                <span id="summaryNights">-</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Guests</span>
+                                <span id="summaryGuests">2</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-section pricing">
+                            <div class="summary-row">
+                                <span>Nightly Rate</span>
+                                <span id="nightlyRate">$150</span>
+                            </div>
+                            <div class="summary-row">
+                                <span id="nightsLabel">0 nights</span>
+                                <span id="nightsTotal">$0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Cleaning Fee</span>
+                                <span id="cleaningFee">$75</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Service Fee</span>
+                                <span id="serviceFee">$25</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-total">
+                            <strong>Total</strong>
+                            <strong id="totalPrice">$0</strong>
+                        </div>
+
+                        <div class="secure-payment">
+                            <p>🔒 Secure payment processing</p>
+                        </div>
+                    </div>
+
+                    <div class="help-card">
+                        <h4>Need Help?</h4>
+                        <p>Questions about your booking?</p>
+                        <a href="index.html#contact" class="btn btn-outline">Contact Us</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 SmartStayz, LLC. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/booking.js"></script>
+</body>
+</html>
