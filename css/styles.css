@@ -572,6 +572,35 @@ a {
     box-shadow: 0 0 0 3px rgba(166, 115, 82, 0.1);
 }
 
+/* Contact Form Message */
+#contactFormMessage {
+    margin: 1rem 0;
+    padding: 0;
+    border-radius: 4px;
+    display: none;
+}
+
+#contactFormMessage.show {
+    display: block;
+}
+
+#contactFormMessage p {
+    margin: 0;
+    padding: 1rem;
+}
+
+#contactFormMessage.success {
+    background: #e8f4e8;
+    border-left: 4px solid #4caf50;
+    color: #2e7d32;
+}
+
+#contactFormMessage.error {
+    background: #ffe8e8;
+    border-left: 4px solid #d32f2f;
+    color: #c62828;
+}
+
 /* Footer */
 .footer {
     background: var(--deep-earth);

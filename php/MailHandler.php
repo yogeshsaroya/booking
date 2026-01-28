@@ -32,15 +32,16 @@ class MailHandler {
      * @param string $textBody Plain text email body (optional)
      * @param array $cc CC addresses (optional)
      * @param array $bcc BCC addresses (optional)
+     * @param string $replyTo Reply-To email address (optional)
      * @return bool Success/failure
      */
-    public function send($to, $subject, $htmlBody, $textBody = '', $cc = [], $bcc = []) {
+    public function send($to, $subject, $htmlBody, $textBody = '', $cc = [], $bcc = [], $replyTo = '') {
         try {
             // Use PHPMailer if available, otherwise use PHP mail as fallback
             if ($this->isPhpMailerAvailable()) {
-                return $this->sendWithPhpMailer($to, $subject, $htmlBody, $textBody, $cc, $bcc);
+                return $this->sendWithPhpMailer($to, $subject, $htmlBody, $textBody, $cc, $bcc, $replyTo);
             } else {
-                return $this->sendWithPhpMail($to, $subject, $htmlBody, $cc, $bcc);
+                return $this->sendWithPhpMail($to, $subject, $htmlBody, $cc, $bcc, $replyTo);
             }
         } catch (Exception $e) {
             logMessage("Mail sending error: " . $e->getMessage(), 'ERROR');
@@ -58,8 +59,8 @@ class MailHandler {
     /**
      * Send email via PHPMailer (Recommended - SMTP)
      */
-    private function sendWithPhpMailer($to, $subject, $htmlBody, $textBody, $cc, $bcc) {
-        require __DIR__ . '/../vendor/autoload.php';
+    private function sendWithPhpMailer($to, $subject, $htmlBody, $textBody, $cc, $bcc, $replyTo = '') {
+        require_once __DIR__ . '/../vendor/autoload.php';
         
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
 
@@ -75,6 +76,11 @@ class MailHandler {
 
             // Set from address
             $mail->setFrom($this->from_email, $this->from_name);
+
+            // Add Reply-To if provided
+            if (!empty($replyTo)) {
+                $mail->addReplyTo($replyTo);
+            }
 
             // Add recipient
             $mail->addAddress($to);
@@ -118,10 +124,15 @@ class MailHandler {
     /**
      * Send email via PHP mail() function (Fallback)
      */
-    private function sendWithPhpMail($to, $subject, $htmlBody, $cc, $bcc) {
+    private function sendWithPhpMail($to, $subject, $htmlBody, $cc, $bcc, $replyTo = '') {
         $headers = "MIME-Version: 1.0\r\n";
         $headers .= "Content-type: text/html; charset=UTF-8\r\n";
         $headers .= "From: {$this->from_name} <{$this->from_email}>\r\n";
+
+        // Add Reply-To header
+        if (!empty($replyTo)) {
+            $headers .= "Reply-To: $replyTo\r\n";
+        }
 
         // Add CC headers
         if (!empty($cc) && is_array($cc)) {

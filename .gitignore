@@ -5,3 +5,4 @@ php/logs/
 php/logs/
 php/bookings/
 php/cache/
+composer.lock

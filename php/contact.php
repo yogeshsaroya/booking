@@ -28,7 +28,7 @@ try {
     $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
     $message = htmlspecialchars($data['message']);
     
-    // Send email to admin
+    // Send email to admin with Reply-To set to the sender
     $subject = "New Contact Form Submission from $name";
     $emailMessage = "
     <h2>New Contact Form Submission</h2>
@@ -41,7 +41,8 @@ try {
     ";
     
     $mailHandler = new MailHandler();
-    $sent = $mailHandler->send($_ENV['ADMIN_EMAIL'], $subject, $emailMessage, '', [$email]);
+    // Last parameter is replyTo - when you reply to this email, it goes to the sender
+    $sent = $mailHandler->send($_ENV['ADMIN_EMAIL'], $subject, $emailMessage, '', [], [], $email);
     
     if (!$sent) {
         throw new Exception('Failed to send email');

@@ -64,13 +64,27 @@ function handleContactForm(e) {
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
     
+    // Get or create message div
+    let messageDiv = document.getElementById('contactFormMessage');
+    if (!messageDiv) {
+        messageDiv = document.createElement('div');
+        messageDiv.id = 'contactFormMessage';
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        e.target.insertBefore(messageDiv, submitBtn);
+    }
+    
+    // Clear previous state
+    messageDiv.className = '';
+    messageDiv.style.display = 'none';
+    messageDiv.innerHTML = '';
+    
     // Show loading state
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Sending...';
     submitBtn.disabled = true;
     
-    // Send to backend (you'll need to implement this PHP endpoint)
+    // Send to backend
     fetch('php/contact.php', {
         method: 'POST',
         headers: {
@@ -80,16 +94,26 @@ function handleContactForm(e) {
     })
     .then(response => response.json())
     .then(result => {
+        messageDiv.style.display = 'block';
+        
         if (result.success) {
-            alert('Message sent successfully! We\'ll respond within an hour.');
+            messageDiv.className = 'success';
+            messageDiv.innerHTML = '<p>✓ Message sent successfully! We\'ll respond within an hour.</p>';
             e.target.reset();
         } else {
-            alert('Error sending message. Please try again or email us directly.');
+            messageDiv.className = 'error';
+            messageDiv.innerHTML = '<p>Error: ' + (result.error || 'Failed to send message. Please try again or email us directly.') + '</p>';
         }
+        
+        // Scroll to message
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error sending message. Please try again or email us directly.');
+        messageDiv.style.display = 'block';
+        messageDiv.className = 'error';
+        messageDiv.innerHTML = '<p>Error sending message. Please try again or email us directly.</p>';
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     })
     .finally(() => {
         submitBtn.textContent = originalText;
