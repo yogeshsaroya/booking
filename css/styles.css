@@ -274,6 +274,20 @@ a {
     font-size: 1.05rem;
 }
 
+.btn:disabled {
+    background: var(--stone-gray);
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+.btn:disabled:hover {
+    background: var(--stone-gray);
+    transform: none;
+    box-shadow: none;
+}
+
 /* Image Placeholders */
 .image-placeholder {
     width: 100%;
