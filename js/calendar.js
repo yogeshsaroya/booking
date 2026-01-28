@@ -227,15 +227,19 @@ function handleDayClick(propertyId, dateString) {
             // Check if there are any blocked dates in between
             if (!hasBlockedDatesBetween(propertyId, dates.checkIn, dateString)) {
                 dates.checkOut = dateString;
-                updateCalendarSelection(propertyId);
                 // Hide error message if dates are now valid
                 const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
                 if (errorMsg) errorMsg.style.display = 'none';
+                updateCalendarSelection(propertyId);
             } else {
                 // Show error message instead of alert
                 const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
-                if (errorMsg) errorMsg.style.display = 'block';
+                if (errorMsg) {
+                    errorMsg.style.display = 'block';
+                }
+                // Reset dates after showing error
                 dates.checkIn = null;
+                dates.checkOut = null;
                 updateCalendarSelection(propertyId);
             }
         } else {
