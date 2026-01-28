@@ -30,6 +30,10 @@ try {
             handleStripePayment($data);
             break;
             
+        case 'confirm_payment':
+            handlePaymentConfirmation($data);
+            break;
+            
         case 'create_bitcoin_booking':
             handleBitcoinBooking($data);
             break;
@@ -93,6 +97,31 @@ function handleStripePayment($data) {
         'success' => true,
         'clientSecret' => $paymentIntent->client_secret,
         'bookingId' => $bookingId
+    ]);
+}
+
+/**
+ * Handle payment confirmation (after successful Stripe payment)
+ */
+function handlePaymentConfirmation($data) {
+    $bookingId = $data['bookingId'] ?? null;
+    $paymentIntentId = $data['paymentIntentId'] ?? null;
+    
+    if (!$bookingId) {
+        throw new Exception('Booking ID is required');
+    }
+    
+    // Update booking status to confirmed
+    updateBooking($bookingId, [
+        'status' => 'confirmed',
+        'payment_status' => 'paid',
+        'stripe_payment_intent' => $paymentIntentId,
+        'confirmed_at' => date('Y-m-d H:i:s')
+    ]);
+    
+    echo json_encode([
+        'success' => true,
+        'message' => 'Booking confirmed'
     ]);
 }
 

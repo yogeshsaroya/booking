@@ -28,7 +28,7 @@ const PROPERTIES = {
 // Stripe configuration
 let stripe;
 let cardElement;
-const STRIPE_PUBLIC_KEY = 'pk_test_51SsksaCm3m1aQwAMQWOohMVFKgeNOJ5cbAXJKxC8yrIoLf0ciWkDNN7d4HuzA4Wv7uHroLnsC6E4e5SzzkQ0DxtD00cVn1SGau'; // Replace with actual key
+let STRIPE_PUBLIC_KEY = null;
 
 // Booking data
 let bookingData = {
@@ -66,7 +66,7 @@ function hideErrorMessage() {
 /**
  * Initialize booking page
  */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const propertyId = urlParams.get('property');
@@ -102,8 +102,8 @@ document.addEventListener('DOMContentLoaded', function() {
     displayPropertyInfo();
     displayBookingSummary();
     
-    // Initialize Stripe
-    initializeStripe();
+    // Load Stripe public key and initialize
+    await loadStripeKey();
     
     // Setup payment method toggle
     setupPaymentMethodToggle();
@@ -162,6 +162,23 @@ function displayBookingSummary() {
         document.getElementById('nightsLabel').textContent = '0 nights';
         document.getElementById('nightsTotal').textContent = '$0';
         document.getElementById('totalPrice').textContent = '$0';
+    }
+}
+
+/**
+ * Load Stripe public key from server
+ */
+async function loadStripeKey() {
+    try {
+        const response = await fetch('php/get-stripe-key.php');
+        const data = await response.json();
+        STRIPE_PUBLIC_KEY = data.publicKey;
+        
+        // Initialize Stripe after key is loaded
+        initializeStripe();
+    } catch (error) {
+        console.error('Failed to load Stripe key:', error);
+        showErrorMessage('Unable to initialize payment system. Please refresh the page.');
     }
 }
 
@@ -332,6 +349,19 @@ async function processStripePayment(bookingData) {
         }
         
         if (paymentIntent.status === 'succeeded') {
+            // Update booking status to confirmed
+            await fetch('php/payment-handler.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'confirm_payment',
+                    bookingId: result.bookingId,
+                    paymentIntentId: paymentIntent.id
+                })
+            });
+            
             // Send confirmation email
             await sendBookingConfirmation({...bookingData, paymentIntentId: paymentIntent.id});
             
