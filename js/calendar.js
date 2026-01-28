@@ -340,10 +340,31 @@ function updateCalendarSelection(propertyId) {
             // Hide error message when valid dates are selected
             const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
             if (errorMsg) errorMsg.style.display = 'none';
+            
+            // Update sidebar elements if they exist (for property detail pages)
+            const sidebarMessage = document.getElementById(`selectedDates-${propertyId}-sidebar`);
+            const sidebarBookBtn = document.getElementById(`bookBtn-${propertyId}-sidebar`);
+            const sidebarCheckInDisplay = document.getElementById(`checkInDisplay-${propertyId}-sidebar`);
+            const sidebarCheckOutDisplay = document.getElementById(`checkOutDisplay-${propertyId}-sidebar`);
+            const sidebarError = document.getElementById(`errorMessage-${propertyId}-sidebar`);
+            
+            if (sidebarMessage && sidebarBookBtn) {
+                sidebarCheckInDisplay.textContent = dates.checkIn;
+                sidebarCheckOutDisplay.textContent = dates.checkOut;
+                sidebarMessage.style.display = 'block';
+                sidebarBookBtn.disabled = false;
+                if (sidebarError) sidebarError.style.display = 'none';
+            }
         } else if (dates.checkIn) {
             // Only check-in selected, hide message but keep button disabled
             messageDiv.style.display = 'none';
             bookBtn.disabled = true;
+            
+            // Disable sidebar button too
+            const sidebarMessage = document.getElementById(`selectedDates-${propertyId}-sidebar`);
+            const sidebarBookBtn = document.getElementById(`bookBtn-${propertyId}-sidebar`);
+            if (sidebarMessage) sidebarMessage.style.display = 'none';
+            if (sidebarBookBtn) sidebarBookBtn.disabled = true;
         }
     }
 }

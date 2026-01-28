@@ -256,31 +256,21 @@
                             <div class="rating-small">★ 4.97 · Highly Rated</div>
                         </div>
 
-                        <div class="booking-dates">
-                            <div class="date-input-group">
-                                <label>Check-in</label>
-                                <input type="date" id="checkInDate" name="checkIn">
-                            </div>
-                            <div class="date-input-group">
-                                <label>Check-out</label>
-                                <input type="date" id="checkOutDate" name="checkOut">
-                            </div>
+                        <div class="selected-dates-message" id="selectedDates-copper-sidebar" style="display: none;">
+                            <p style="margin: 1rem 0; padding: 1rem; background: #e8f4f8; border-radius: 4px; color: #333; font-size: 0.9rem;">
+                                ✓ Check-in: <strong id="checkInDisplay-copper-sidebar"></strong><br>
+                                ✓ Check-out: <strong id="checkOutDisplay-copper-sidebar"></strong>
+                            </p>
                         </div>
 
-                        <div class="guests-input">
-                            <label>Guests</label>
-                            <select id="guestsSelect" name="guests">
-                                <option value="1">1 guest</option>
-                                <option value="2" selected>2 guests</option>
-                                <option value="3">3 guests</option>
-                                <option value="4">4 guests</option>
-                                <option value="5">5 guests</option>
-                                <option value="6">6 guests</option>
-                            </select>
+                        <div class="error-message" id="errorMessage-copper-sidebar" style="display: none;">
+                            <p style="margin: 1rem 0; padding: 1rem; background: #ffe8e8; border-left: 4px solid #d32f2f; border-radius: 4px; color: #c62828; font-size: 0.9rem;">
+                                Please select dates from the calendar above.
+                            </p>
                         </div>
 
-                        <button class="btn btn-primary btn-large" onclick="bookProperty('copper')">
-                            Check Availability
+                        <button class="btn btn-primary btn-large" id="bookBtn-copper-sidebar" onclick="bookPropertyWithDates('copper', selectedDates.copper.checkIn, selectedDates.copper.checkOut, 1)" disabled>
+                            Book Now
                         </button>
 
                         <div class="pricing-breakdown">
