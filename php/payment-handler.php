@@ -19,6 +19,11 @@ $data = json_decode($input, true);
 $action = $data['action'] ?? null;
 
 try {
+    // Check if Stripe key is configured
+    if (!STRIPE_SECRET_KEY) {
+        throw new Exception('Stripe API key not configured. Please check your .env file.');
+    }
+    
     switch ($action) {
         case 'create_payment_intent':
             handleStripePayment($data);
