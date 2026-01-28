@@ -143,31 +143,6 @@ if (!function_exists('getDBConnection')) {
 }
 
 /**
- * Send email helper
- */
-if (!function_exists('sendEmail')) {
-    function sendEmail($to, $subject, $message, $headers = [])
-    {
-        $defaultHeaders = [
-            'From' => FROM_NAME . ' <' . FROM_EMAIL . '>',
-            'Reply-To' => FROM_EMAIL,
-            'X-Mailer' => 'PHP/' . phpversion(),
-            'MIME-Version' => '1.0',
-            'Content-Type' => 'text/html; charset=UTF-8'
-        ];
-
-        $headers = array_merge($defaultHeaders, $headers);
-
-        $headerString = '';
-        foreach ($headers as $key => $value) {
-            $headerString .= "$key: $value\r\n";
-        }
-
-        return mail($to, $subject, $message, $headerString);
-    }
-}
-
-/**
  * Log function for debugging
  */
 if (!function_exists('logMessage')) {

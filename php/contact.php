@@ -4,6 +4,7 @@
  */
 
 require_once 'config.php';
+require_once 'MailHandler.php';
 
 header('Content-Type: application/json');
 
@@ -39,9 +40,8 @@ try {
     <p><em>Sent from SmartStayz contact form</em></p>
     ";
     
-    $sent = sendEmail(ADMIN_EMAIL, $subject, $emailMessage, [
-        'Reply-To' => $email
-    ]);
+    $mailHandler = new MailHandler();
+    $sent = $mailHandler->send($_ENV['ADMIN_EMAIL'], $subject, $emailMessage, '', [$email]);
     
     if (!$sent) {
         throw new Exception('Failed to send email');
@@ -57,7 +57,7 @@ try {
     <p>Best regards,<br>SmartStayz Team</p>
     ";
     
-    sendEmail($email, "We received your message", $confirmationMessage);
+    $mailHandler->send($email, "We received your message", $confirmationMessage);
     
     // Log the contact
     logMessage("Contact form submission from $name ($email)");

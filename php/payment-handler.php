@@ -5,6 +5,7 @@
  */
 
 require_once 'config.php';
+require_once 'MailHandler.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // Composer autoload for Stripe SDK
 
 use Stripe\Stripe;
@@ -384,7 +385,8 @@ function sendBitcoinPaymentEmail($data, $bookingId, $invoiceUrl = null) {
     <p>Best regards,<br>SmartStayz Team</p>
     ";
     
-    sendEmail($data['email'], "Bitcoin Payment Instructions - $bookingId", $message);
+    $mailHandler = new MailHandler();
+    $mailHandler->send($data['email'], "Bitcoin Payment Instructions - $bookingId", $message);
 }
 
 /**
@@ -453,5 +455,6 @@ function sendAdminNotification($bookingData) {
     </p>
     ";
     
-    sendEmail(ADMIN_EMAIL, "New Booking: {$bookingData['booking_id']}", $message);
+    $mailHandler = new MailHandler();
+    $mailHandler->send($_ENV['ADMIN_EMAIL'], "New Booking: {$bookingData['booking_id']}", $message);
 }
