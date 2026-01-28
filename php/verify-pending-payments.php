@@ -29,6 +29,7 @@ try {
         FROM bookings 
         WHERE status = 'pending' 
         AND payment_status = 'pending'
+        AND payment_method = 'stripe'
         AND stripe_payment_intent IS NOT NULL
         AND stripe_payment_intent != ''
         LIMIT 50
