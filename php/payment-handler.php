@@ -69,29 +69,44 @@ function handleStripePayment($data) {
         throw new Exception('Selected dates are no longer available');
     }
     
-    // Create booking record
-    $bookingId = createBooking($data, 'pending');
+    // Generate booking ID first (needed for PaymentIntent metadata)
+    $bookingId = uniqid('BOOK-', true);
     
-    // Create Stripe PaymentIntent
-    $paymentIntent = PaymentIntent::create([
-        'amount' => $data['amount'] * 100, // Convert to cents
-        'currency' => 'usd',
-        'payment_method_types' => ['card'],
-        'description' => "SmartStayz - {$data['property']} - " . 
-                        "{$data['checkIn']} to {$data['checkOut']}",
-        'metadata' => [
-            'booking_id' => $bookingId,
-            'property' => $data['property'],
-            'check_in' => $data['checkIn'],
-            'check_out' => $data['checkOut'],
-            'guest_name' => "{$data['firstName']} {$data['lastName']}",
-            'guest_email' => $data['email']
-        ],
-        'receipt_email' => $data['email']
-    ]);
+    // Create Stripe PaymentIntent FIRST
+    try {
+        $paymentIntent = PaymentIntent::create([
+            'amount' => $data['amount'] * 100, // Convert to cents
+            'currency' => 'usd',
+            'payment_method_types' => ['card'],
+            'description' => "SmartStayz - {$data['property']} - " . 
+                            "{$data['checkIn']} to {$data['checkOut']}",
+            'metadata' => [
+                'booking_id' => $bookingId,
+                'property' => $data['property'],
+                'check_in' => $data['checkIn'],
+                'check_out' => $data['checkOut'],
+                'guest_name' => "{$data['firstName']} {$data['lastName']}",
+                'guest_email' => $data['email']
+            ],
+            'receipt_email' => $data['email']
+        ]);
+    } catch (Exception $e) {
+        logMessage("PaymentIntent creation failed: " . $e->getMessage(), 'ERROR');
+        throw new Exception('Payment initialization failed. Please try again.');
+    }
     
-    // Update booking with payment intent ID
-    updateBooking($bookingId, ['stripe_payment_intent' => $paymentIntent->id]);
+    // Only create booking record if PaymentIntent was successful
+    try {
+        createBookingWithId($bookingId, $data, 'pending', $paymentIntent->id);
+    } catch (Exception $e) {
+        // If booking creation fails, cancel the PaymentIntent
+        try {
+            $paymentIntent->cancel();
+        } catch (Exception $cancelError) {
+            logMessage("Failed to cancel PaymentIntent: " . $cancelError->getMessage(), 'WARNING');
+        }
+        throw $e;
+    }
     
     echo json_encode([
         'success' => true,
@@ -305,7 +320,13 @@ function isDateRangeAvailable($propertyId, $checkIn, $checkOut) {
  */
 function createBooking($data, $status) {
     $bookingId = uniqid('BOOK-', true);
-    
+    return createBookingWithId($bookingId, $data, $status);
+}
+
+/**
+ * Create booking record with specific ID
+ */
+function createBookingWithId($bookingId, $data, $status, $paymentIntentId = null) {
     $bookingData = [
         'booking_id' => $bookingId,
         'property' => $data['property'],
@@ -325,6 +346,11 @@ function createBooking($data, $status) {
         'created_at' => date('Y-m-d H:i:s')
     ];
     
+    // Add payment intent ID if provided
+    if ($paymentIntentId) {
+        $bookingData['stripe_payment_intent'] = $paymentIntentId;
+    }
+    
     // Try to save to database if available
     try {
         $pdo = getDBConnection();
@@ -337,6 +363,7 @@ function createBooking($data, $status) {
         }
     } catch (Exception $e) {
         logMessage("Database insert failed: " . $e->getMessage(), 'WARNING');
+        throw new Exception('Failed to create booking record');
     }
     
     // Also save to file as backup
