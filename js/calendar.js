@@ -211,7 +211,9 @@ function formatDate(date) {
  * Handle day click for date selection
  */
 function handleDayClick(propertyId, dateString) {
+    console.log('Day clicked:', propertyId, dateString);
     const dates = selectedDates[propertyId];
+    console.log('Current dates:', dates);
     const clickedDate = new Date(dateString);
     
     // If no check-in selected, set it
@@ -288,10 +290,13 @@ function hasBlockedDatesBetween(propertyId, startDate, endDate) {
  * Update calendar visual selection
  */
 function updateCalendarSelection(propertyId) {
+    console.log('updateCalendarSelection called for:', propertyId);
     const calendarContainer = document.querySelector(`#calendar-${propertyId} .calendar-container`);
+    console.log('Calendar container:', calendarContainer);
     if (!calendarContainer) return;
     
     const dates = selectedDates[propertyId];
+    console.log('Dates for display:', dates);
     const days = calendarContainer.querySelectorAll('.calendar-day');
     
     // Remove all selection classes
@@ -302,12 +307,23 @@ function updateCalendarSelection(propertyId) {
     // Update message and button
     const messageDiv = document.getElementById(`selectedDates-${propertyId}`);
     const bookBtn = document.getElementById(`bookBtn-${propertyId}`);
+    console.log('Message div:', messageDiv);
+    console.log('Book button:', bookBtn);
+    
+    // For property detail pages, check sidebar elements if main ones don't exist
+    const sidebarMessage = document.getElementById(`selectedDates-${propertyId}-sidebar`);
+    const sidebarBookBtn = document.getElementById(`bookBtn-${propertyId}-sidebar`);
+    const sidebarCheckInDisplay = document.getElementById(`checkInDisplay-${propertyId}-sidebar`);
+    const sidebarCheckOutDisplay = document.getElementById(`checkOutDisplay-${propertyId}-sidebar`);
+    const sidebarError = document.getElementById(`errorMessage-${propertyId}-sidebar`);
     
     if (!dates.checkIn) {
         // Hide success message and disable button
         // Keep error message visible if it's showing
         if (messageDiv) messageDiv.style.display = 'none';
         if (bookBtn) bookBtn.disabled = true;
+        if (sidebarMessage) sidebarMessage.style.display = 'none';
+        if (sidebarBookBtn) sidebarBookBtn.disabled = true;
         return;
     }
     
@@ -332,41 +348,34 @@ function updateCalendarSelection(propertyId) {
     });
     
     // Show message and update button when dates are selected
-    if (messageDiv && bookBtn) {
-        if (dates.checkIn && dates.checkOut) {
-            document.getElementById(`checkInDisplay-${propertyId}`).textContent = dates.checkIn;
-            document.getElementById(`checkOutDisplay-${propertyId}`).textContent = dates.checkOut;
+    if (dates.checkIn && dates.checkOut) {
+        // Update main calendar elements if they exist (properties.html)
+        if (messageDiv && bookBtn) {
+            const checkInDisplay = document.getElementById(`checkInDisplay-${propertyId}`);
+            const checkOutDisplay = document.getElementById(`checkOutDisplay-${propertyId}`);
+            if (checkInDisplay) checkInDisplay.textContent = dates.checkIn;
+            if (checkOutDisplay) checkOutDisplay.textContent = dates.checkOut;
             messageDiv.style.display = 'block';
             bookBtn.disabled = false;
             // Hide error message when valid dates are selected
             const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
             if (errorMsg) errorMsg.style.display = 'none';
-            
-            // Update sidebar elements if they exist (for property detail pages)
-            const sidebarMessage = document.getElementById(`selectedDates-${propertyId}-sidebar`);
-            const sidebarBookBtn = document.getElementById(`bookBtn-${propertyId}-sidebar`);
-            const sidebarCheckInDisplay = document.getElementById(`checkInDisplay-${propertyId}-sidebar`);
-            const sidebarCheckOutDisplay = document.getElementById(`checkOutDisplay-${propertyId}-sidebar`);
-            const sidebarError = document.getElementById(`errorMessage-${propertyId}-sidebar`);
-            
-            if (sidebarMessage && sidebarBookBtn) {
-                sidebarCheckInDisplay.textContent = dates.checkIn;
-                sidebarCheckOutDisplay.textContent = dates.checkOut;
-                sidebarMessage.style.display = 'block';
-                sidebarBookBtn.disabled = false;
-                if (sidebarError) sidebarError.style.display = 'none';
-            }
-        } else if (dates.checkIn) {
-            // Only check-in selected, hide message but keep button disabled
-            messageDiv.style.display = 'none';
-            bookBtn.disabled = true;
-            
-            // Disable sidebar button too
-            const sidebarMessage = document.getElementById(`selectedDates-${propertyId}-sidebar`);
-            const sidebarBookBtn = document.getElementById(`bookBtn-${propertyId}-sidebar`);
-            if (sidebarMessage) sidebarMessage.style.display = 'none';
-            if (sidebarBookBtn) sidebarBookBtn.disabled = true;
         }
+        
+        // Update sidebar elements (property detail pages)
+        if (sidebarMessage && sidebarBookBtn) {
+            if (sidebarCheckInDisplay) sidebarCheckInDisplay.textContent = dates.checkIn;
+            if (sidebarCheckOutDisplay) sidebarCheckOutDisplay.textContent = dates.checkOut;
+            sidebarMessage.style.display = 'block';
+            sidebarBookBtn.disabled = false;
+            if (sidebarError) sidebarError.style.display = 'none';
+        }
+    } else if (dates.checkIn) {
+        // Only check-in selected, hide message but keep button disabled
+        if (messageDiv) messageDiv.style.display = 'none';
+        if (bookBtn) bookBtn.disabled = true;
+        if (sidebarMessage) sidebarMessage.style.display = 'none';
+        if (sidebarBookBtn) sidebarBookBtn.disabled = true;
     }
 }
 

@@ -51,8 +51,15 @@ if (!defined('DB_USER')) define('DB_USER', $_ENV['DB_USER'] ?? getenv('DB_USER')
 if (!defined('DB_PASS')) define('DB_PASS', $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: 'root');
 
 // Stripe Configuration
-if (!defined('STRIPE_SECRET_KEY')) define('STRIPE_SECRET_KEY', $_ENV['STRIPE_SECRET_KEY'] ?? getenv('STRIPE_SECRET_KEY') ?: '');
-if (!defined('STRIPE_PUBLIC_KEY')) define('STRIPE_PUBLIC_KEY', $_ENV['STRIPE_PUBLIC_KEY'] ?? getenv('STRIPE_PUBLIC_KEY') ?: '');
+// Dynamically set keys based on STRIPE_MODE
+$stripeMode = $_ENV['STRIPE_MODE'] ?? getenv('STRIPE_MODE') ?: 'test';
+if ($stripeMode === 'live') {
+    if (!defined('STRIPE_SECRET_KEY')) define('STRIPE_SECRET_KEY', $_ENV['STRIPE_SECRET_KEY_LIVE'] ?? getenv('STRIPE_SECRET_KEY_LIVE') ?: '');
+    if (!defined('STRIPE_PUBLIC_KEY')) define('STRIPE_PUBLIC_KEY', $_ENV['STRIPE_PUBLIC_KEY_LIVE'] ?? getenv('STRIPE_PUBLIC_KEY_LIVE') ?: '');
+} else {
+    if (!defined('STRIPE_SECRET_KEY')) define('STRIPE_SECRET_KEY', $_ENV['STRIPE_SECRET_KEY_TEST'] ?? getenv('STRIPE_SECRET_KEY_TEST') ?: '');
+    if (!defined('STRIPE_PUBLIC_KEY')) define('STRIPE_PUBLIC_KEY', $_ENV['STRIPE_PUBLIC_KEY_TEST'] ?? getenv('STRIPE_PUBLIC_KEY_TEST') ?: '');
+}
 
 // BTCPay Server Configuration (for Bitcoin payments)
 if (!defined('BTCPAY_SERVER_URL')) define('BTCPAY_SERVER_URL', $_ENV['BTCPAY_SERVER_URL'] ?? getenv('BTCPAY_SERVER_URL') ?: '');

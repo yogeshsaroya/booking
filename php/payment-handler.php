@@ -72,6 +72,7 @@ function handleStripePayment($data) {
     $paymentIntent = PaymentIntent::create([
         'amount' => $data['amount'] * 100, // Convert to cents
         'currency' => 'usd',
+        'payment_method_types' => ['card'],
         'description' => "SmartStayz - {$data['property']} - " . 
                         "{$data['checkIn']} to {$data['checkOut']}",
         'metadata' => [

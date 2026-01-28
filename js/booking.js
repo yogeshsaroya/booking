@@ -178,6 +178,7 @@ function initializeStripe() {
     const elements = stripe.elements();
     
     cardElement = elements.create('card', {
+        hidePostalCode: false,
         style: {
             base: {
                 fontSize: '16px',
