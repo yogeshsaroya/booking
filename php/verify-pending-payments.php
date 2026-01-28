@@ -109,8 +109,8 @@ try {
                 echo "  ⚠ Payment REQUIRES ACTION - Marking as failed..." . ($isCLI ? "\n" : "<br>\n");
                 logMessage("Payment requires action for booking $bookingId", 'WARNING');
                 updateBooking($bookingId, [
-                    'status' => 'failed',
-                    'payment_error' => 'Payment requires payment method'
+                    'status' => 'failed'
+                    
                 ]);
                 
                 // Send failed payment emails to user and admin

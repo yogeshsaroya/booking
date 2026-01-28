@@ -110,9 +110,7 @@ function handlePaymentIntentFailed($paymentIntent) {
     
     // Update booking status
     updateBooking($bookingId, [
-        'status' => 'failed',
-        'payment_error' => $paymentIntent->last_payment_error['message'] ?? 'Payment failed'
-    ]);
+        'status' => 'failed' ]);
     
     // Send payment failed emails to user and admin
     $bookingFile = __DIR__ . "/bookings/{$bookingId}.json";
