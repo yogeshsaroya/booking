@@ -361,9 +361,10 @@ window.highlightDateRange = function(checkIn, checkOut) {
 /**
  * Book property with specific dates from calendar selection
  */
-function bookPropertyWithDates(propertyId, checkIn, checkOut) {
-    const guests = document.getElementById('guests')?.value || '1';
-    const url = `booking.html?property=${propertyId}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`;
+function bookPropertyWithDates(propertyId, checkIn, checkOut, guests) {
+    // Use passed guests value or get from dropdown with fallback to 1
+    const guestCount = guests || document.getElementById(`guests-${propertyId}`)?.value || '1';
+    const url = `booking.html?property=${propertyId}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guestCount}`;
     window.location.href = url;
 }
 
