@@ -104,13 +104,17 @@
 
 .checkbox-group label {
     display: flex;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: 0.5rem;
     font-weight: 400;
 }
 
 .checkbox-group input[type="checkbox"] {
-    margin-top: 0.25rem;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin: 0;
 }
 
 .checkbox-group a {
