@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed - SmartStayz</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/booking.css">
+    <link rel="stylesheet" href="css/confirmation.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Karla:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">SmartStayz</a>
+            <ul class="nav-menu">
+                <li><a href="properties.html">Properties</a></li>
+                <li><a href="index.html#amenities">Amenities</a></li>
+                <li><a href="index.html#location">Location</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Confirmation Section -->
+    <section class="confirmation-section">
+        <div class="container">
+            <div class="confirmation-container">
+                
+                <!-- Success Message -->
+                <div class="confirmation-card">
+                    <div class="success-icon">✓</div>
+                    <h1>Booking Confirmed!</h1>
+                    <p class="confirmation-subtitle">Thank you for booking with SmartStayz</p>
+                    
+                    <div class="confirmation-message">
+                        <p>Your booking has been successfully confirmed. A confirmation email with all the details has been sent to your email address.</p>
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div class="confirmation-details">
+                        <h2>Booking Details</h2>
+                        
+                        <div class="details-section">
+                            <div class="details-row">
+                                <span class="details-label">Booking ID</span>
+                                <span class="details-value" id="bookingId">-</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label">Property</span>
+                                <span class="details-value" id="propertyName">-</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label">Check-in</span>
+                                <span class="details-value" id="checkInDate">-</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label">Check-out</span>
+                                <span class="details-value" id="checkOutDate">-</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label">Nights</span>
+                                <span class="details-value" id="nightsCount">-</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label">Number of Guests</span>
+                                <span class="details-value" id="guestCount">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Guest Information -->
+                    <div class="confirmation-details">
+                        <h2>Guest Information</h2>
+                        
+                        <div class="details-section">
+                            <div class="details-row">
+                                <span class="details-label">Guest Name</span>
+                                <span class="details-value" id="guestName">-</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label">Email</span>
+                                <span class="details-value" id="guestEmail">-</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label">Phone</span>
+                                <span class="details-value" id="guestPhone">-</span>
+                            </div>
+                            <div class="details-row" id="petRowContainer" style="display: none;">
+                                <span class="details-label">Pets</span>
+                                <span class="details-value" id="petStatus">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary -->
+                    <div class="confirmation-details">
+                        <h2>Payment Summary</h2>
+                        
+                        <div class="details-section pricing">
+                            <div class="details-row">
+                                <span class="details-label">Nightly Rate</span>
+                                <span class="details-value" id="nightlyRate">$0</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label" id="nightsLabel">0 nights</span>
+                                <span class="details-value" id="nightsTotal">$0</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label">Cleaning Fee</span>
+                                <span class="details-value" id="cleaningFee">$0</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="details-label">Service Fee</span>
+                                <span class="details-value" id="serviceFee">$0</span>
+                            </div>
+                            <div class="details-row total">
+                                <span class="details-label">Total</span>
+                                <span class="details-value" id="totalAmount">$0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="confirmation-details">
+                        <h2>Payment Method</h2>
+                        <div class="payment-info">
+                            <p id="paymentMethodText">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div class="next-steps">
+                        <h3>What's Next?</h3>
+                        <ul>
+                            <li>Check your email for the confirmation details and payment instructions (if applicable)</li>
+                            <li>Save your booking ID for reference: <strong id="bookingIdNext">-</strong></li>
+                            <li>Review the cancellation policy and property rules</li>
+                            <li>We'll send you check-in instructions 7 days before your arrival</li>
+                        </ul>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="confirmation-actions">
+                        <a href="properties.html" class="btn btn-secondary">Browse More Properties</a>
+                        <a href="index.html" class="btn btn-outline">Return to Home</a>
+                    </div>
+                </div>
+
+                <!-- Contact Support -->
+                <div class="support-card">
+                    <h3>Questions?</h3>
+                    <p>If you have any questions about your booking or need assistance, please don't hesitate to reach out.</p>
+                    <a href="index.html#contact" class="btn btn-primary btn-small">Contact Support</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 SmartStayz, LLC. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/confirmation.js"></script>
+</body>
+</html>

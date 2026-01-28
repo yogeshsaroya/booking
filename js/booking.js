@@ -344,6 +344,8 @@ async function processStripePayment(bookingData) {
             
             // Redirect after 2 seconds
             setTimeout(() => {
+                // Store booking data for confirmation page
+                sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
                 window.location.href = 'confirmation.html?booking=' + result.bookingId;
             }, 2000);
         }
@@ -382,6 +384,8 @@ async function processBitcoinBooking(bookingData) {
             
             // Redirect after 2 seconds
             setTimeout(() => {
+                // Store booking data for confirmation page
+                sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
                 window.location.href = 'confirmation.html?booking=' + result.bookingId;
             }, 2000);
         } else {
@@ -421,6 +425,8 @@ async function processManualBooking(bookingData) {
             
             // Redirect after 2 seconds
             setTimeout(() => {
+                // Store booking data for confirmation page
+                sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
                 window.location.href = 'confirmation.html?booking=' + result.bookingId;
             }, 2000);
         } else {
