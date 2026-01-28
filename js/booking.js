@@ -168,6 +168,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Load Stripe public key and initialize
     await loadStripeKey();
     
+    // Load and filter payment methods based on configuration
+    await loadPaymentMethods();
+    
     // Setup payment method toggle
     setupPaymentMethodToggle();
     
@@ -242,6 +245,47 @@ async function loadStripeKey() {
     } catch (error) {
         console.error('Failed to load Stripe key:', error);
         showErrorMessage('Unable to initialize payment system. Please refresh the page.');
+    }
+}
+
+/**
+ * Load available payment methods from server
+ */
+async function loadPaymentMethods() {
+    try {
+        const response = await fetch('php/get-payment-methods.php');
+        const data = await response.json();
+        
+        if (data.success && data.paymentMethods) {
+            // Hide payment options that are not configured
+            if (!data.paymentMethods.stripe) {
+                const stripeOption = document.querySelector('input[value="stripe"]')?.closest('.payment-option');
+                if (stripeOption) stripeOption.style.display = 'none';
+            }
+            
+            if (!data.paymentMethods.bitcoin) {
+                const bitcoinOption = document.querySelector('input[value="bitcoin"]')?.closest('.payment-option');
+                if (bitcoinOption) bitcoinOption.style.display = 'none';
+            }
+            
+            if (!data.paymentMethods.venmo) {
+                const venmoOption = document.querySelector('input[value="venmo"]')?.closest('.payment-option');
+                if (venmoOption) venmoOption.style.display = 'none';
+            }
+            
+            // Ensure at least one payment method is available and selected
+            const availableOptions = document.querySelectorAll('.payment-option:not([style*="display: none"]) input[type="radio"]');
+            if (availableOptions.length > 0) {
+                availableOptions[0].checked = true;
+                // Trigger change event to show correct payment section
+                availableOptions[0].dispatchEvent(new Event('change'));
+            } else {
+                hideBookingForm();
+                showErrorMessage('No payment methods are currently available. Please contact us to complete your booking.');
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load payment methods:', error);
     }
 }
 
