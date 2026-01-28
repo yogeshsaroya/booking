@@ -56,7 +56,7 @@ try {
 }
 
 /**
- * Handle Stripe payment
+ * Handle Stripe payment - Create PaymentIntent ONLY (no booking yet)
  */
 function handleStripePayment($data) {
     Stripe::setApiKey(STRIPE_SECRET_KEY);
@@ -69,10 +69,10 @@ function handleStripePayment($data) {
         throw new Exception('Selected dates are no longer available');
     }
     
-    // Step 3: Generate booking ID
+    // Step 3: Generate booking ID (for metadata only, no DB record yet)
     $bookingId = uniqid('BOOK-', true);
     
-    // Step 4: Create Stripe PaymentIntent (if this fails, nothing gets created)
+    // Step 4: Create Stripe PaymentIntent (NO booking created yet)
     try {
         $paymentIntent = PaymentIntent::create([
             'amount' => $data['amount'] * 100, // Convert to cents
@@ -86,7 +86,13 @@ function handleStripePayment($data) {
                 'check_in' => $data['checkIn'],
                 'check_out' => $data['checkOut'],
                 'guest_name' => "{$data['firstName']} {$data['lastName']}",
-                'guest_email' => $data['email']
+                'guest_email' => $data['email'],
+                'guests' => $data['guests'],
+                'nights' => $data['nights'],
+                'phone' => $data['phone'],
+                'has_pets' => $data['hasPets'] ? '1' : '0',
+                'special_requests' => $data['specialRequests'] ?? '',
+                'payment_method' => $data['paymentMethod']
             ],
             'receipt_email' => $data['email']
         ]);
@@ -95,22 +101,7 @@ function handleStripePayment($data) {
         throw new Exception('Payment initialization failed. Please try again.');
     }
     
-    // Step 5: ONLY create booking record if everything above passed
-    try {
-        createBookingWithId($bookingId, $data, 'pending', $paymentIntent->id);
-        // Booking created successfully - admin email is sent inside createBookingWithId
-    } catch (Exception $e) {
-        // If booking creation fails, cancel the PaymentIntent to clean up
-        try {
-            $paymentIntent->cancel();
-            logMessage("PaymentIntent cancelled after booking creation failed: {$bookingId}", 'INFO');
-        } catch (Exception $cancelError) {
-            logMessage("Failed to cancel PaymentIntent: " . $cancelError->getMessage(), 'WARNING');
-        }
-        throw new Exception('Failed to create booking. Please try again.');
-    }
-    
-    // Step 6: Return success response
+    // Step 5: Return success response (booking will be created AFTER payment succeeds)
     echo json_encode([
         'success' => true,
         'clientSecret' => $paymentIntent->client_secret,
@@ -120,26 +111,57 @@ function handleStripePayment($data) {
 
 /**
  * Handle payment confirmation (after successful Stripe payment)
+ * THIS is where the booking record gets created
  */
 function handlePaymentConfirmation($data) {
     $bookingId = $data['bookingId'] ?? null;
     $paymentIntentId = $data['paymentIntentId'] ?? null;
     
-    if (!$bookingId) {
-        throw new Exception('Booking ID is required');
+    if (!$bookingId || !$paymentIntentId) {
+        throw new Exception('Booking ID and Payment Intent ID are required');
     }
     
-    // Update booking status to pending
-    updateBooking($bookingId, [
-        'status' => 'pending',
-        'stripe_payment_intent' => $paymentIntentId
-    ]);
-    
-    // Send booking received email
-    $bookingFile = __DIR__ . "/bookings/{$bookingId}.json";
-    if (file_exists($bookingFile)) {
-        $bookingData = json_decode(file_get_contents($bookingFile), true);
-        sendBookingReceivedEmail($bookingData);
+    // Verify payment with Stripe
+    Stripe::setApiKey(STRIPE_SECRET_KEY);
+    try {
+        $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+        
+        // Only create booking if payment actually succeeded
+        if ($paymentIntent->status !== 'succeeded') {
+            throw new Exception('Payment has not been completed yet');
+        }
+        
+        // Extract booking data from PaymentIntent metadata
+        $metadata = $paymentIntent->metadata;
+        $bookingData = [
+            'property' => $metadata['property'],
+            'checkIn' => $metadata['check_in'],
+            'checkOut' => $metadata['check_out'],
+            'nights' => $metadata['nights'],
+            'guests' => $metadata['guests'],
+            'firstName' => explode(' ', $metadata['guest_name'])[0] ?? '',
+            'lastName' => explode(' ', $metadata['guest_name'], 2)[1] ?? '',
+            'email' => $metadata['guest_email'],
+            'phone' => $metadata['phone'],
+            'hasPets' => $metadata['has_pets'] === '1',
+            'specialRequests' => $metadata['special_requests'] ?? '',
+            'paymentMethod' => $metadata['payment_method'],
+            'amount' => $paymentIntent->amount / 100 // Convert back from cents
+        ];
+        
+        // NOW create the booking record (with confirmed payment)
+        createBookingWithId($bookingId, $bookingData, 'pending', $paymentIntentId);
+        
+        // Send booking received email to user
+        $bookingFile = __DIR__ . "/bookings/{$bookingId}.json";
+        if (file_exists($bookingFile)) {
+            $bookingFileData = json_decode(file_get_contents($bookingFile), true);
+            sendBookingReceivedEmail($bookingFileData);
+        }
+        
+    } catch (Exception $e) {
+        logMessage("Payment confirmation failed: " . $e->getMessage(), 'ERROR');
+        throw new Exception('Failed to confirm payment: ' . $e->getMessage());
     }
     
     echo json_encode([
