@@ -398,10 +398,10 @@ function sendBookingReceivedEmail($bookingData) {
     
     <h3>Booking Details</h3>
     <ul>
-        <li><strong>Booking ID:</strong> {$bookingData['bookingId']}</li>
+        <li><strong>Booking ID:</strong> {$bookingData['booking_id']}</li>
         <li><strong>Property:</strong> {$property['name']}</li>
-        <li><strong>Check-in:</strong> {$bookingData['checkIn']}</li>
-        <li><strong>Check-out:</strong> {$bookingData['checkOut']}</li>
+        <li><strong>Check-in:</strong> {$bookingData['check_in']}</li>
+        <li><strong>Check-out:</strong> {$bookingData['check_out']}</li>
         <li><strong>Guests:</strong> {$bookingData['guests']}</li>
         <li><strong>Total Amount:</strong> \${$bookingData['amount']}</li>
     </ul>
