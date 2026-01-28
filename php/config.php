@@ -2,33 +2,53 @@
 
 /**
  * SmartStayz Configuration
- * Update these values with your actual credentials and settings
+ * Load environment variables from .env file
  */
 
-// Database Configuration (if you want to store bookings)
-if (!defined('DB_HOST')) define('DB_HOST', 'localhost');
-if (!defined('DB_NAME')) define('DB_NAME', 'smartstayz_bookings');
-if (!defined('DB_USER')) define('DB_USER', 'root');
-if (!defined('DB_PASS')) define('DB_PASS', 'root');
+// Load .env file
+$envFile = __DIR__ . '/../.env';
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos($line, '=') === false || strpos($line, '#') === 0) {
+            continue;
+        }
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        $_ENV[$key] = $value;
+    }
+}
 
+// Helper function to get env variable
+function getEnv($key, $default = null)
+{
+    return $_ENV[$key] ?? getenv($key) ?: $default;
+}
+
+// Database Configuration
+if (!defined('DB_HOST')) define('DB_HOST', getEnv('DB_HOST', 'localhost'));
+if (!defined('DB_NAME')) define('DB_NAME', getEnv('DB_NAME', 'smartstayz_bookings'));
+if (!defined('DB_USER')) define('DB_USER', getEnv('DB_USER', 'root'));
+if (!defined('DB_PASS')) define('DB_PASS', getEnv('DB_PASS', 'root'));
 
 // Stripe Configuration
-if (!defined('STRIPE_SECRET_KEY')) define('STRIPE_SECRET_KEY', 'sk_test_51SsksaCm3m1aQwAM');
-if (!defined('STRIPE_PUBLIC_KEY')) define('STRIPE_PUBLIC_KEY', 'pk_test_51SsksaCm3m1aQwAMQWOohMVFKgeNOJ5cbAXJKxC8yrIoLf0ciWkDNN7d4HuzA4Wv7uHroLnsC6E4e5SzzkQ0DxtD00cVn1SGau');
+if (!defined('STRIPE_SECRET_KEY')) define('STRIPE_SECRET_KEY', getEnv('STRIPE_SECRET_KEY', ''));
+if (!defined('STRIPE_PUBLIC_KEY')) define('STRIPE_PUBLIC_KEY', getEnv('STRIPE_PUBLIC_KEY', ''));
 
 // BTCPay Server Configuration (for Bitcoin payments)
-if (!defined('BTCPAY_SERVER_URL')) define('BTCPAY_SERVER_URL', 'https://your-btcpay-server.com');
-if (!defined('BTCPAY_STORE_ID')) define('BTCPAY_STORE_ID', '');
-if (!defined('BTCPAY_API_KEY')) define('BTCPAY_API_KEY', '');
+if (!defined('BTCPAY_SERVER_URL')) define('BTCPAY_SERVER_URL', getEnv('BTCPAY_SERVER_URL', ''));
+if (!defined('BTCPAY_STORE_ID')) define('BTCPAY_STORE_ID', getEnv('BTCPAY_STORE_ID', ''));
+if (!defined('BTCPAY_API_KEY')) define('BTCPAY_API_KEY', getEnv('BTCPAY_API_KEY', ''));
 
 // Email Configuration
-if (!defined('ADMIN_EMAIL')) define('ADMIN_EMAIL', 'info@smartstayz.com');
-if (!defined('FROM_EMAIL')) define('FROM_EMAIL', 'info@smartstayz.com');
-if (!defined('FROM_NAME')) define('FROM_NAME', 'SmartStayz');
+if (!defined('ADMIN_EMAIL')) define('ADMIN_EMAIL', getEnv('ADMIN_EMAIL', 'info@smartstayz.com'));
+if (!defined('FROM_EMAIL')) define('FROM_EMAIL', getEnv('FROM_EMAIL', 'info@smartstayz.com'));
+if (!defined('FROM_NAME')) define('FROM_NAME', getEnv('FROM_NAME', 'SmartStayz'));
 
 // Venmo/CashApp Information
-if (!defined('VENMO_USERNAME')) define('VENMO_USERNAME', '');
-if (!defined('CASHAPP_USERNAME')) define('CASHAPP_USERNAME', '');
+if (!defined('VENMO_USERNAME')) define('VENMO_USERNAME', getEnv('VENMO_USERNAME', ''));
+if (!defined('CASHAPP_USERNAME')) define('CASHAPP_USERNAME', getEnv('CASHAPP_USERNAME', ''));
 
 // Property iCal URLs from Airbnb
 // To get these URLs: 
@@ -38,9 +58,9 @@ if (!defined('CASHAPP_USERNAME')) define('CASHAPP_USERNAME', '');
 // 4. Copy the iCal link for each property
 
 if (!defined('PROPERTY_ICAL_URLS')) define('PROPERTY_ICAL_URLS', [
-    'stone' => 'https://www.airbnb.com/calendar/ical/42680597.ics?t=11f3e596bb3745e2b7f8fd08d205da81',
-    'copper' => 'https://www.airbnb.com/calendar/ical/44434858.ics?t=96ceb60ec506418b82d6cd93014b0654',
-    'cedar' => 'https://www.airbnb.com/calendar/ical/40961787.ics?t=13020d9706a64e2a84d6152569802d81'
+    'stone' => getEnv('PROPERTY_ICAL_STONE', ''),
+    'copper' => getEnv('PROPERTY_ICAL_COPPER', ''),
+    'cedar' => getEnv('PROPERTY_ICAL_CEDAR', '')
 ]);
 
 // Property Information
@@ -70,10 +90,10 @@ if (!defined('PROPERTIES')) define('PROPERTIES', [
 
 // Cache settings
 if (!defined('CACHE_DIR')) define('CACHE_DIR', __DIR__ . '/cache');
-if (!defined('CACHE_DURATION')) define('CACHE_DURATION', 3600); // 1 hour in seconds
+if (!defined('CACHE_DURATION')) define('CACHE_DURATION', (int)getEnv('CACHE_DURATION', 3600));
 
 // Timezone
-date_default_timezone_set('America/New_York');
+date_default_timezone_set(getEnv('TIMEZONE', 'America/New_York'));
 
 /**
  * Create cache directory if it doesn't exist
