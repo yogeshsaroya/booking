@@ -170,6 +170,6 @@ function logMessage($message, $level = 'INFO')
 }
 // Set error reporting
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Don't display errors to users
+ini_set('display_errors', 1); // Don't display errors to users
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/logs/php-errors.log');
