@@ -228,8 +228,13 @@ function handleDayClick(propertyId, dateString) {
             if (!hasBlockedDatesBetween(propertyId, dates.checkIn, dateString)) {
                 dates.checkOut = dateString;
                 updateCalendarSelection(propertyId);
+                // Hide error message if dates are now valid
+                const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
+                if (errorMsg) errorMsg.style.display = 'none';
             } else {
-                alert('There are booked dates in your selected range. Please choose different dates.');
+                // Show error message instead of alert
+                const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
+                if (errorMsg) errorMsg.style.display = 'block';
                 dates.checkIn = null;
                 updateCalendarSelection(propertyId);
             }
@@ -286,6 +291,8 @@ function updateCalendarSelection(propertyId) {
     if (!dates.checkIn) {
         // Hide message and disable button
         if (messageDiv) messageDiv.style.display = 'none';
+        const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
+        if (errorMsg) errorMsg.style.display = 'none';
         if (bookBtn) bookBtn.disabled = true;
         return;
     }
