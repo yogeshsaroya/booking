@@ -1,3 +1,7 @@
 vendor/
 .env
 
+php/logs/
+php/logs/
+php/bookings/
+php/cache/

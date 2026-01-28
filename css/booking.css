@@ -199,7 +199,14 @@
     margin-top: 0.5rem;
 }
 
-.booking-form .error-message {
+#card-errors {
+    color: #d32f2f;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    min-height: auto;
+}
+
+#bookingErrorMessage {
     padding: 1rem;
     margin: 1.5rem 0;
     background: #ffe8e8;
@@ -209,7 +216,7 @@
     color: #c62828;
 }
 
-.booking-form .error-message p {
+#bookingErrorMessage p {
     margin: 0;
 }
 

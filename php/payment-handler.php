@@ -240,7 +240,7 @@ function isDateRangeAvailable($propertyId, $checkIn, $checkOut) {
     
     $result = json_decode($response, true);
     
-    if (!$result['success']) {
+    if (!$result || !$result['success']) {
         // If we can't check availability, allow booking but notify admin
         logMessage("Could not verify availability for $propertyId", 'WARNING');
         return true;
