@@ -199,6 +199,20 @@
     margin-top: 0.5rem;
 }
 
+.booking-form .error-message {
+    padding: 1rem;
+    margin: 1.5rem 0;
+    background: #ffe8e8;
+    border-left: 4px solid #d32f2f;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #c62828;
+}
+
+.booking-form .error-message p {
+    margin: 0;
+}
+
 /* Bitcoin/Venmo Info */
 .bitcoin-info,
 .venmo-info {

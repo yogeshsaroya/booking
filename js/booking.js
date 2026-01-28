@@ -44,6 +44,26 @@ let bookingData = {
 };
 
 /**
+ * Display error message below the form
+ */
+function showErrorMessage(message) {
+    const errorDiv = document.getElementById('bookingErrorMessage');
+    const errorText = document.getElementById('bookingErrorText');
+    errorText.textContent = message;
+    errorDiv.style.display = 'block';
+    // Scroll to error message
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/**
+ * Hide error message
+ */
+function hideErrorMessage() {
+    const errorDiv = document.getElementById('bookingErrorMessage');
+    errorDiv.style.display = 'none';
+}
+
+/**
  * Initialize booking page
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -56,8 +76,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Validate property
     if (!propertyId || !PROPERTIES[propertyId]) {
-        alert('Invalid property selection');
-        window.location.href = 'properties.html';
+        showErrorMessage('Invalid property selection. Redirecting to properties...');
+        setTimeout(() => {
+            window.location.href = 'properties.html';
+        }, 2000);
         return;
     }
     
@@ -217,8 +239,7 @@ function setupFormSubmission() {
         
         // Validate dates
         if (!bookingData.checkIn || !bookingData.checkOut) {
-            alert('Please select check-in and check-out dates');
-            window.location.href = `properties.html`;
+            showErrorMessage('Please select check-in and check-out dates before completing your booking.');
             return;
         }
         
@@ -260,7 +281,7 @@ function setupFormSubmission() {
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Booking error. Please try again or contact us.');
+            showErrorMessage('Booking error: ' + (error.message || 'Please try again or contact us.'));
         } finally {
             submitBtn.classList.remove('loading');
             submitBtn.disabled = false;
@@ -313,9 +334,18 @@ async function processStripePayment(bookingData) {
             // Send confirmation email
             await sendBookingConfirmation({...bookingData, paymentIntentId: paymentIntent.id});
             
-            // Show success and redirect
-            alert('Booking confirmed! Check your email for details.');
-            window.location.href = 'confirmation.html?booking=' + result.bookingId;
+            // Show success message with custom styling
+            const errorDiv = document.getElementById('bookingErrorMessage');
+            errorDiv.style.background = '#e8f4e8';
+            errorDiv.style.borderColor = '#4caf50';
+            const errorText = document.getElementById('bookingErrorText');
+            errorText.textContent = '✓ Booking confirmed! Check your email for details.';
+            errorDiv.style.display = 'block';
+            
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'confirmation.html?booking=' + result.bookingId;
+            }, 2000);
         }
         
     } catch (error) {
@@ -342,8 +372,18 @@ async function processBitcoinBooking(bookingData) {
         const result = await response.json();
         
         if (result.success) {
-            alert('Booking request received! Check your email for Bitcoin payment instructions.');
-            window.location.href = 'confirmation.html?booking=' + result.bookingId;
+            // Show success message with custom styling
+            const errorDiv = document.getElementById('bookingErrorMessage');
+            errorDiv.style.background = '#e8f4e8';
+            errorDiv.style.borderColor = '#4caf50';
+            const errorText = document.getElementById('bookingErrorText');
+            errorText.textContent = '✓ Booking request received! Check your email for Bitcoin payment instructions.';
+            errorDiv.style.display = 'block';
+            
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'confirmation.html?booking=' + result.bookingId;
+            }, 2000);
         } else {
             throw new Error(result.error || 'Booking failed');
         }
@@ -371,8 +411,18 @@ async function processManualBooking(bookingData) {
         const result = await response.json();
         
         if (result.success) {
-            alert('Booking request received! Check your email for payment instructions.');
-            window.location.href = 'confirmation.html?booking=' + result.bookingId;
+            // Show success message with custom styling
+            const errorDiv = document.getElementById('bookingErrorMessage');
+            errorDiv.style.background = '#e8f4e8';
+            errorDiv.style.borderColor = '#4caf50';
+            const errorText = document.getElementById('bookingErrorText');
+            errorText.textContent = '✓ Booking request received! Check your email for payment instructions.';
+            errorDiv.style.display = 'block';
+            
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'confirmation.html?booking=' + result.bookingId;
+            }, 2000);
         } else {
             throw new Error(result.error || 'Booking failed');
         }
