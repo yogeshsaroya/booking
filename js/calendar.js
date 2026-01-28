@@ -243,7 +243,17 @@ function handleDayClick(propertyId, dateString) {
                 updateCalendarSelection(propertyId);
             }
         } else {
-            alert('Check-out must be after check-in');
+            // Show error message - check-out must be after check-in
+            const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
+            if (errorMsg) {
+                errorMsg.style.display = 'block';
+                // Update error message text
+                errorMsg.querySelector('p').textContent = 'Check-out date must be after check-in date. Please choose different dates.';
+            }
+            // Reset dates
+            dates.checkIn = null;
+            dates.checkOut = null;
+            updateCalendarSelection(propertyId);
         }
     }
     // Reset if both are selected
