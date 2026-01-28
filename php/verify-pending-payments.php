@@ -14,25 +14,29 @@ use Stripe\PaymentIntent;
 // Set Stripe API key
 Stripe::setApiKey(STRIPE_SECRET_KEY);
 
+// Check if running from CLI or web
+$isCLI = php_sapi_name() === 'cli';
+
 $output = [];
 $output[] = "=== Starting Payment Verification ===";
 $output[] = "Timestamp: " . date('Y-m-d H:i:s');
 $output[] = "";
 
-echo implode("\n", $output);
+$separator = $isCLI ? "\n" : "<br>\n";
+echo implode($separator, $output);
 logMessage("=== Starting Payment Verification ===", 'INFO');
 
 try {
     // Get all pending bookings with Stripe payment intent
-    echo "Connecting to database...\n";
+    echo "Connecting to database..." . ($isCLI ? "\n" : "<br>\n");
     $pdo = new PDO(
         'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME,
         DB_USER,
         DB_PASS
     );
-    echo "✓ Database connected\n";
+    echo "✓ Database connected" . ($isCLI ? "\n" : "<br>\n");
     
-    echo "Fetching pending bookings...\n";
+    echo "Fetching pending bookings..." . ($isCLI ? "\n" : "<br>\n");
     $stmt = $pdo->prepare("
         SELECT booking_id, stripe_payment_intent 
         FROM bookings 
@@ -46,12 +50,12 @@ try {
     $pendingBookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     $message = "Found " . count($pendingBookings) . " pending bookings to verify";
-    echo "✓ $message\n";
+    echo "✓ $message" . ($isCLI ? "\n" : "<br>\n");
     logMessage($message, 'INFO');
     
     if (empty($pendingBookings)) {
-        echo "No pending bookings found. Exiting.\n";
-        echo "\n=== Payment Verification Complete ===\n";
+        echo "No pending bookings found. Exiting." . ($isCLI ? "\n" : "<br>\n");
+        echo ($isCLI ? "\n" : "<br>\n") . "=== Payment Verification Complete ===" . ($isCLI ? "\n" : "<br>\n");
         logMessage("=== Payment Verification Complete ===", 'INFO');
         exit;
     }
@@ -60,7 +64,7 @@ try {
     $failureCount = 0;
     $errorCount = 0;
     
-    echo "\n--- Processing Bookings ---\n";
+    echo ($isCLI ? "\n" : "<br>\n") . "--- Processing Bookings ---" . ($isCLI ? "\n" : "<br>\n");
     
     foreach ($pendingBookings as $booking) {
         $bookingId = $booking['booking_id'];
@@ -68,16 +72,16 @@ try {
         
         try {
             // Fetch payment intent from Stripe
-            echo "\nBooking ID: $bookingId\n";
-            echo "  Payment Intent: $paymentIntentId\n";
+            echo ($isCLI ? "\n" : "<br>\n") . "Booking ID: $bookingId" . ($isCLI ? "\n" : "<br>\n");
+            echo "  Payment Intent: $paymentIntentId" . ($isCLI ? "\n" : "<br>\n");
             $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
             
-            echo "  Stripe Status: {$paymentIntent->status}\n";
+            echo "  Stripe Status: {$paymentIntent->status}" . ($isCLI ? "\n" : "<br>\n");
             logMessage("Checking booking $bookingId - PaymentIntent: $paymentIntentId - Status: {$paymentIntent->status}", 'INFO');
             
             // If payment succeeded, update booking
             if ($paymentIntent->status === 'succeeded') {
-                echo "  ✓ Payment SUCCEEDED - Updating booking to confirmed...\n";
+                echo "  ✓ Payment SUCCEEDED - Updating booking to confirmed..." . ($isCLI ? "\n" : "<br>\n");
                 logMessage("Payment verified for booking $bookingId - Updating status to confirmed", 'INFO');
                 
                 updateBooking($bookingId, [
@@ -93,7 +97,7 @@ try {
                     $bookingData = json_decode(file_get_contents($bookingFile), true);
                     if ($bookingData['email']) {
                         sendConfirmationEmail($bookingData);
-                        echo "  ✓ Confirmation email sent to {$bookingData['email']}\n";
+                        echo "  ✓ Confirmation email sent to {$bookingData['email']}" . ($isCLI ? "\n" : "<br>\n");
                         logMessage("Confirmation email sent for booking $bookingId", 'INFO');
                     }
                 }
@@ -101,7 +105,7 @@ try {
             }
             // If payment failed, update booking status
             elseif ($paymentIntent->status === 'requires_payment_method') {
-                echo "  ⚠ Payment REQUIRES ACTION - Marking as failed...\n";
+                echo "  ⚠ Payment REQUIRES ACTION - Marking as failed..." . ($isCLI ? "\n" : "<br>\n");
                 logMessage("Payment requires action for booking $bookingId", 'WARNING');
                 updateBooking($bookingId, [
                     'status' => 'failed',
@@ -109,26 +113,26 @@ try {
                 ]);
                 $failureCount++;
             } else {
-                echo "  ℹ Payment status: {$paymentIntent->status} (no action needed)\n";
+                echo "  ℹ Payment status: {$paymentIntent->status} (no action needed)" . ($isCLI ? "\n" : "<br>\n");
             }
             
         } catch (Exception $e) {
-            echo "  ✗ ERROR: " . $e->getMessage() . "\n";
+            echo "  ✗ ERROR: " . $e->getMessage() . ($isCLI ? "\n" : "<br>\n");
             logMessage("Error verifying booking $bookingId: " . $e->getMessage(), 'ERROR');
             $errorCount++;
         }
     }
     
-    echo "\n--- Summary ---\n";
-    echo "Bookings Processed: " . count($pendingBookings) . "\n";
-    echo "✓ Confirmed: $successCount\n";
-    echo "⚠ Failed: $failureCount\n";
-    echo "✗ Errors: $errorCount\n";
-    echo "\n=== Payment Verification Complete ===\n";
+    echo ($isCLI ? "\n" : "<br>\n") . "--- Summary ---" . ($isCLI ? "\n" : "<br>\n");
+    echo "Bookings Processed: " . count($pendingBookings) . ($isCLI ? "\n" : "<br>\n");
+    echo "✓ Confirmed: $successCount" . ($isCLI ? "\n" : "<br>\n");
+    echo "⚠ Failed: $failureCount" . ($isCLI ? "\n" : "<br>\n");
+    echo "✗ Errors: $errorCount" . ($isCLI ? "\n" : "<br>\n");
+    echo ($isCLI ? "\n" : "<br>\n") . "=== Payment Verification Complete ===" . ($isCLI ? "\n" : "<br>\n");
     logMessage("=== Payment Verification Complete ===", 'INFO');
     
 } catch (Exception $e) {
-    echo "✗ FATAL ERROR: " . $e->getMessage() . "\n";
+    echo "✗ FATAL ERROR: " . $e->getMessage() . ($isCLI ? "\n" : "<br>\n");
     logMessage("Cron job error: " . $e->getMessage(), 'ERROR');
 }
 
