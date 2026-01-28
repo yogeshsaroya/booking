@@ -335,6 +335,11 @@ async function processStripePayment(bookingData) {
             // Send confirmation email
             await sendBookingConfirmation({...bookingData, paymentIntentId: paymentIntent.id});
             
+            // Disable submit button to prevent duplicate submissions
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Redirecting...';
+            
             // Show success message with custom styling
             const errorDiv = document.getElementById('bookingErrorMessage');
             errorDiv.style.background = '#e8f4e8';
@@ -375,6 +380,11 @@ async function processBitcoinBooking(bookingData) {
         const result = await response.json();
         
         if (result.success) {
+            // Disable submit button to prevent duplicate submissions
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Redirecting...';
+            
             // Show success message with custom styling
             const errorDiv = document.getElementById('bookingErrorMessage');
             errorDiv.style.background = '#e8f4e8';
@@ -416,6 +426,11 @@ async function processManualBooking(bookingData) {
         const result = await response.json();
         
         if (result.success) {
+            // Disable submit button to prevent duplicate submissions
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Redirecting...';
+            
             // Show success message with custom styling
             const errorDiv = document.getElementById('bookingErrorMessage');
             errorDiv.style.background = '#e8f4e8';
