@@ -35,41 +35,38 @@ if (file_exists($envFile)) {
 }
 
 // Helper function to get env variable
-function getEnv($key, $default = null)
-{
-    if (isset($_ENV[$key]) && $_ENV[$key] !== '') {
-        return $_ENV[$key];
+if (!function_exists('getEnv')) {
+    function getEnv($key, $default = null)
+    {
+        global $_ENV;
+        
+        return $_ENV[$key] ?? getenv($key) ?: $default;
     }
-    $envValue = getenv($key);
-    if ($envValue !== false && $envValue !== '') {
-        return $envValue;
-    }
-    return $default;
 }
 
 // Database Configuration
-if (!defined('DB_HOST')) define('DB_HOST', getEnv('DB_HOST', 'localhost'));
-if (!defined('DB_NAME')) define('DB_NAME', getEnv('DB_NAME', 'smartstayz_bookings'));
-if (!defined('DB_USER')) define('DB_USER', getEnv('DB_USER', 'root'));
-if (!defined('DB_PASS')) define('DB_PASS', getEnv('DB_PASS', 'root'));
+if (!defined('DB_HOST')) define('DB_HOST', $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost');
+if (!defined('DB_NAME')) define('DB_NAME', $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'smartstayz_bookings');
+if (!defined('DB_USER')) define('DB_USER', $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'root');
+if (!defined('DB_PASS')) define('DB_PASS', $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: 'root');
 
 // Stripe Configuration
-if (!defined('STRIPE_SECRET_KEY')) define('STRIPE_SECRET_KEY', getEnv('STRIPE_SECRET_KEY', ''));
-if (!defined('STRIPE_PUBLIC_KEY')) define('STRIPE_PUBLIC_KEY', getEnv('STRIPE_PUBLIC_KEY', ''));
+if (!defined('STRIPE_SECRET_KEY')) define('STRIPE_SECRET_KEY', $_ENV['STRIPE_SECRET_KEY'] ?? getenv('STRIPE_SECRET_KEY') ?: '');
+if (!defined('STRIPE_PUBLIC_KEY')) define('STRIPE_PUBLIC_KEY', $_ENV['STRIPE_PUBLIC_KEY'] ?? getenv('STRIPE_PUBLIC_KEY') ?: '');
 
 // BTCPay Server Configuration (for Bitcoin payments)
-if (!defined('BTCPAY_SERVER_URL')) define('BTCPAY_SERVER_URL', getEnv('BTCPAY_SERVER_URL', ''));
-if (!defined('BTCPAY_STORE_ID')) define('BTCPAY_STORE_ID', getEnv('BTCPAY_STORE_ID', ''));
-if (!defined('BTCPAY_API_KEY')) define('BTCPAY_API_KEY', getEnv('BTCPAY_API_KEY', ''));
+if (!defined('BTCPAY_SERVER_URL')) define('BTCPAY_SERVER_URL', $_ENV['BTCPAY_SERVER_URL'] ?? getenv('BTCPAY_SERVER_URL') ?: '');
+if (!defined('BTCPAY_STORE_ID')) define('BTCPAY_STORE_ID', $_ENV['BTCPAY_STORE_ID'] ?? getenv('BTCPAY_STORE_ID') ?: '');
+if (!defined('BTCPAY_API_KEY')) define('BTCPAY_API_KEY', $_ENV['BTCPAY_API_KEY'] ?? getenv('BTCPAY_API_KEY') ?: '');
 
 // Email Configuration
-if (!defined('ADMIN_EMAIL')) define('ADMIN_EMAIL', getEnv('ADMIN_EMAIL', 'info@smartstayz.com'));
-if (!defined('FROM_EMAIL')) define('FROM_EMAIL', getEnv('FROM_EMAIL', 'info@smartstayz.com'));
-if (!defined('FROM_NAME')) define('FROM_NAME', getEnv('FROM_NAME', 'SmartStayz'));
+if (!defined('ADMIN_EMAIL')) define('ADMIN_EMAIL', $_ENV['ADMIN_EMAIL'] ?? getenv('ADMIN_EMAIL') ?: 'info@smartstayz.com');
+if (!defined('FROM_EMAIL')) define('FROM_EMAIL', $_ENV['FROM_EMAIL'] ?? getenv('FROM_EMAIL') ?: 'info@smartstayz.com');
+if (!defined('FROM_NAME')) define('FROM_NAME', $_ENV['FROM_NAME'] ?? getenv('FROM_NAME') ?: 'SmartStayz');
 
 // Venmo/CashApp Information
-if (!defined('VENMO_USERNAME')) define('VENMO_USERNAME', getEnv('VENMO_USERNAME', ''));
-if (!defined('CASHAPP_USERNAME')) define('CASHAPP_USERNAME', getEnv('CASHAPP_USERNAME', ''));
+if (!defined('VENMO_USERNAME')) define('VENMO_USERNAME', $_ENV['VENMO_USERNAME'] ?? getenv('VENMO_USERNAME') ?: '');
+if (!defined('CASHAPP_USERNAME')) define('CASHAPP_USERNAME', $_ENV['CASHAPP_USERNAME'] ?? getenv('CASHAPP_USERNAME') ?: '');
 
 // Property iCal URLs from Airbnb
 // To get these URLs: 
@@ -79,9 +76,9 @@ if (!defined('CASHAPP_USERNAME')) define('CASHAPP_USERNAME', getEnv('CASHAPP_USE
 // 4. Copy the iCal link for each property
 
 if (!defined('PROPERTY_ICAL_URLS')) define('PROPERTY_ICAL_URLS', [
-    'stone' => getEnv('PROPERTY_ICAL_STONE', ''),
-    'copper' => getEnv('PROPERTY_ICAL_COPPER', ''),
-    'cedar' => getEnv('PROPERTY_ICAL_CEDAR', '')
+    'stone' => $_ENV['PROPERTY_ICAL_STONE'] ?? '',
+    'copper' => $_ENV['PROPERTY_ICAL_COPPER'] ?? '',
+    'cedar' => $_ENV['PROPERTY_ICAL_CEDAR'] ?? ''
 ]);
 
 // Property Information
@@ -111,10 +108,10 @@ if (!defined('PROPERTIES')) define('PROPERTIES', [
 
 // Cache settings
 if (!defined('CACHE_DIR')) define('CACHE_DIR', __DIR__ . '/cache');
-if (!defined('CACHE_DURATION')) define('CACHE_DURATION', (int)getEnv('CACHE_DURATION', 3600));
+if (!defined('CACHE_DURATION')) define('CACHE_DURATION', (int)($_ENV['CACHE_DURATION'] ?? 3600));
 
 // Timezone
-date_default_timezone_set(getEnv('TIMEZONE', 'America/New_York'));
+date_default_timezone_set($_ENV['TIMEZONE'] ?? 'America/New_York');
 
 /**
  * Create cache directory if it doesn't exist
