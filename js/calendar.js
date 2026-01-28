@@ -5,9 +5,9 @@
 
 // Property iCal URLs (these will be loaded from PHP config in production)
 const PROPERTY_ICAL_URLS = {
-    stone: '/php/calendar-sync.php?property=stone',
-    copper: '/php/calendar-sync.php?property=copper',
-    cedar: '/php/calendar-sync.php?property=cedar'
+    stone: 'php/calendar-sync.php?property=stone',
+    copper: 'php/calendar-sync.php?property=copper',
+    cedar: 'php/calendar-sync.php?property=cedar'
 };
 
 // Store for calendar data
@@ -22,6 +22,13 @@ let currentMonth = {
     stone: new Date(),
     copper: new Date(),
     cedar: new Date()
+};
+
+// Selected dates for each property
+let selectedDates = {
+    stone: { checkIn: null, checkOut: null },
+    copper: { checkIn: null, checkOut: null },
+    cedar: { checkIn: null, checkOut: null }
 };
 
 /**
@@ -203,12 +210,6 @@ function formatDate(date) {
 /**
  * Handle day click for date selection
  */
-let selectedDates = {
-    stone: { checkIn: null, checkOut: null },
-    copper: { checkIn: null, checkOut: null },
-    cedar: { checkIn: null, checkOut: null }
-};
-
 function handleDayClick(propertyId, dateString) {
     const dates = selectedDates[propertyId];
     const clickedDate = new Date(dateString);

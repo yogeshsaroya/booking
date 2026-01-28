@@ -183,6 +183,7 @@
     background: var(--warm-white);
     border-radius: 4px;
     border: 1px solid rgba(107, 100, 89, 0.1);
+    margin-bottom: var(--spacing-md);
 }
 
 .availability-calendar h3 {
