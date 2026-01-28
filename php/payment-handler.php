@@ -114,8 +114,7 @@ function handlePaymentConfirmation($data) {
     // Update booking status to confirmed
     updateBooking($bookingId, [
         'status' => 'confirmed',
-        'stripe_payment_intent' => $paymentIntentId,
-        'confirmed_at' => date('Y-m-d H:i:s')
+        'stripe_payment_intent' => $paymentIntentId
     ]);
     
     echo json_encode([

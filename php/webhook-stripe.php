@@ -82,8 +82,7 @@ function handlePaymentIntentSucceeded($paymentIntent) {
     // Update booking status
     updateBooking($bookingId, [
         'status' => 'confirmed',
-        'stripe_payment_intent' => $paymentIntent->id,
-        'confirmed_at' => date('Y-m-d H:i:s')
+        'stripe_payment_intent' => $paymentIntent->id
     ]);
     
     // Send confirmation email
