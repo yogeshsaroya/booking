@@ -87,7 +87,7 @@ try {
                 updateBooking($bookingId, [
                     'status' => 'confirmed',
                     'stripe_payment_intent' => $paymentIntentId,
-                    'verification_method' => 'cron_job'
+                    
                 ]);
                 
                 // Send confirmation email if not already sent
