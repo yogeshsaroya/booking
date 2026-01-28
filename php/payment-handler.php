@@ -114,7 +114,6 @@ function handlePaymentConfirmation($data) {
     // Update booking status to confirmed
     updateBooking($bookingId, [
         'status' => 'confirmed',
-        'payment_status' => 'paid',
         'stripe_payment_intent' => $paymentIntentId,
         'confirmed_at' => date('Y-m-d H:i:s')
     ]);

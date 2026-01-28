@@ -82,7 +82,6 @@ function handlePaymentIntentSucceeded($paymentIntent) {
     // Update booking status
     updateBooking($bookingId, [
         'status' => 'confirmed',
-        'payment_status' => 'paid',
         'stripe_payment_intent' => $paymentIntent->id,
         'confirmed_at' => date('Y-m-d H:i:s')
     ]);
@@ -111,7 +110,6 @@ function handlePaymentIntentFailed($paymentIntent) {
     // Update booking status
     updateBooking($bookingId, [
         'status' => 'failed',
-        'payment_status' => 'failed',
         'payment_error' => $paymentIntent->last_payment_error['message'] ?? 'Payment failed'
     ]);
 }
@@ -131,8 +129,7 @@ function handlePaymentIntentCanceled($paymentIntent) {
     
     // Update booking status
     updateBooking($bookingId, [
-        'status' => 'canceled',
-        'payment_status' => 'canceled'
+        'status' => 'canceled'
     ]);
 }
 

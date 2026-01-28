@@ -463,7 +463,8 @@ Add these columns to your bookings table (or create a separate payments table):
 ```sql
 ALTER TABLE bookings ADD COLUMN payment_method VARCHAR(20) DEFAULT NULL;
 ALTER TABLE bookings ADD COLUMN payment_invoice_id VARCHAR(100) DEFAULT NULL;
-ALTER TABLE bookings ADD COLUMN payment_status VARCHAR(20) DEFAULT 'pending';
+<!-- Database column already exists in main schema -->
+<!-- ALTER TABLE bookings ADD COLUMN payment_status VARCHAR(20) DEFAULT 'pending'; -->
 ALTER TABLE bookings ADD COLUMN btc_discount_applied DECIMAL(5,2) DEFAULT NULL;
 
 -- Or create separate payments table

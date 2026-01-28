@@ -139,7 +139,6 @@ All methods update the same booking record:
 ```sql
 UPDATE bookings SET 
     status = 'confirmed',
-    payment_status = 'paid',
     stripe_payment_intent = 'pi_xxxxx',
     confirmed_at = NOW(),
     updated_at = NOW()
