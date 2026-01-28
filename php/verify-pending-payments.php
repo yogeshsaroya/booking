@@ -6,6 +6,7 @@
  */
 
 require_once 'config.php';
+require_once 'email-functions.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Stripe\Stripe;
@@ -90,14 +91,15 @@ try {
                     
                 ]);
                 
-                // Send confirmation email if not already sent
+                // Send confirmation emails to user and admin
                 $bookingFile = __DIR__ . "/bookings/{$bookingId}.json";
                 if (file_exists($bookingFile)) {
                     $bookingData = json_decode(file_get_contents($bookingFile), true);
                     if ($bookingData['email']) {
-                        sendConfirmationEmail($bookingData);
-                        echo "  ✓ Confirmation email sent to {$bookingData['email']}" . ($isCLI ? "\n" : "<br>\n");
-                        logMessage("Confirmation email sent for booking $bookingId", 'INFO');
+                        sendPaymentConfirmationEmail($bookingData);
+                        sendAdminPaymentConfirmationEmail($bookingData);
+                        echo "  ✓ Confirmation emails sent to {$bookingData['email']} and admin" . ($isCLI ? "\n" : "<br>\n");
+                        logMessage("Confirmation emails sent for booking $bookingId", 'INFO');
                     }
                 }
                 $successCount++;
@@ -110,6 +112,15 @@ try {
                     'status' => 'failed',
                     'payment_error' => 'Payment requires payment method'
                 ]);
+                
+                // Send failed payment emails to user and admin
+                $bookingFile = __DIR__ . "/bookings/{$bookingId}.json";
+                if (file_exists($bookingFile)) {
+                    $bookingData = json_decode(file_get_contents($bookingFile), true);
+                    require_once 'email-functions.php';
+                    sendAdminPaymentFailedEmail($bookingData, 'Payment requires payment method');
+                }
+                
                 $failureCount++;
             } else {
                 echo "  ℹ Payment status: {$paymentIntent->status} (no action needed)" . ($isCLI ? "\n" : "<br>\n");
@@ -168,51 +179,6 @@ function updateBooking($bookingId, $updates) {
         $bookingData['updated_at'] = date('Y-m-d H:i:s');
         file_put_contents($bookingFile, json_encode($bookingData, JSON_PRETTY_PRINT));
     }
-}
-
-/**
- * Send confirmation email
- */
-function sendConfirmationEmail($bookingData) {
-    require_once 'MailHandler.php';
-    require_once 'config.php';
-    
-    $mailHandler = new MailHandler();
-    $property = PROPERTIES[$bookingData['property']] ?? ['name' => 'Unknown Property'];
-    $propertyName = is_array($property) ? $property['name'] : $property;
-    $firstName = $bookingData['first_name'] ?? '';
-    $lastName = $bookingData['last_name'] ?? '';
-    $bookingId = $bookingData['booking_id'] ?? '';
-    $checkIn = $bookingData['check_in'] ?? '';
-    $checkOut = $bookingData['check_out'] ?? '';
-    
-    $emailBody = "
-        <h2>✅ Payment Confirmed - Booking Complete!</h2>
-        <p>Hello {$firstName} {$lastName},</p>
-        <p><strong>Great news!</strong> Your payment has been successfully processed and your booking is now confirmed.</p>
-        
-        <h3>Booking Details</h3>
-        <ul>
-            <li><strong>Booking ID:</strong> {$bookingId}</li>
-            <li><strong>Property:</strong> {$propertyName}</li>
-            <li><strong>Check-in:</strong> {$checkIn}</li>
-            <li><strong>Check-out:</strong> {$checkOut}</li>
-            <li><strong>Guests:</strong> {$bookingData['guests']}</li>
-            <li><strong>Total Amount Paid:</strong> \${$bookingData['amount']}</li>
-        </ul>
-        
-        <p><strong>What's Next?</strong></p>
-        <p>You will receive check-in instructions 24-48 hours before your arrival. If you have any questions or special requests, please contact us.</p>
-        
-        <p>We look forward to hosting you!</p>
-        <p>Best regards,<br>SmartStayz Team</p>
-    ";
-    
-    $mailHandler->send(
-        $bookingData['email'],
-        "Payment Confirmed - {$propertyName}",
-        $emailBody
-    );
 }
 
 /**

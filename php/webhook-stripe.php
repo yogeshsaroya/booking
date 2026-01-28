@@ -5,6 +5,7 @@
  */
 
 require_once 'config.php';
+require_once 'email-functions.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Stripe\Stripe;
@@ -85,11 +86,12 @@ function handlePaymentIntentSucceeded($paymentIntent) {
         'stripe_payment_intent' => $paymentIntent->id
     ]);
     
-    // Send confirmation email
+    // Send confirmation emails to user and admin
     $bookingFile = __DIR__ . "/bookings/{$bookingId}.json";
     if (file_exists($bookingFile)) {
         $bookingData = json_decode(file_get_contents($bookingFile), true);
-        sendConfirmationEmail($bookingData);
+        sendPaymentConfirmationEmail($bookingData);
+        sendAdminPaymentConfirmationEmail($bookingData);
     }
 }
 
@@ -112,11 +114,13 @@ function handlePaymentIntentFailed($paymentIntent) {
         'payment_error' => $paymentIntent->last_payment_error['message'] ?? 'Payment failed'
     ]);
     
-    // Send payment failed email
+    // Send payment failed emails to user and admin
     $bookingFile = __DIR__ . "/bookings/{$bookingId}.json";
     if (file_exists($bookingFile)) {
         $bookingData = json_decode(file_get_contents($bookingFile), true);
-        sendPaymentFailedEmail($bookingData, $paymentIntent->last_payment_error['message'] ?? 'Payment failed');
+        $errorMessage = $paymentIntent->last_payment_error['message'] ?? 'Payment failed';
+        sendPaymentFailedEmail($bookingData, $errorMessage);
+        sendAdminPaymentFailedEmail($bookingData, $errorMessage);
     }
 }
 
@@ -169,102 +173,6 @@ function updateBooking($bookingId, $updates) {
         $bookingData['updated_at'] = date('Y-m-d H:i:s');
         file_put_contents($bookingFile, json_encode($bookingData, JSON_PRETTY_PRINT));
     }
-}
-
-/**
- * Send confirmation email
- */
-function sendConfirmationEmail($bookingData) {
-    require_once 'MailHandler.php';
-    require_once 'config.php';
-    
-    $mailHandler = new MailHandler();
-    $property = PROPERTIES[$bookingData['property']] ?? ['name' => 'Unknown Property'];
-    $propertyName = is_array($property) ? $property['name'] : $property;
-    $firstName = $bookingData['first_name'] ?? '';
-    $lastName = $bookingData['last_name'] ?? '';
-    $bookingId = $bookingData['booking_id'] ?? '';
-    $checkIn = $bookingData['check_in'] ?? '';
-    $checkOut = $bookingData['check_out'] ?? '';
-    
-    $emailBody = "
-        <h2>✅ Payment Confirmed - Booking Complete!</h2>
-        <p>Hello {$firstName} {$lastName},</p>
-        <p><strong>Great news!</strong> Your payment has been successfully processed and your booking is now confirmed.</p>
-        
-        <h3>Booking Details</h3>
-        <ul>
-            <li><strong>Booking ID:</strong> {$bookingId}</li>
-            <li><strong>Property:</strong> {$propertyName}</li>
-            <li><strong>Check-in:</strong> {$checkIn}</li>
-            <li><strong>Check-out:</strong> {$checkOut}</li>
-            <li><strong>Guests:</strong> {$bookingData['guests']}</li>
-            <li><strong>Total Amount Paid:</strong> \${$bookingData['amount']}</li>
-        </ul>
-        
-        <p><strong>What's Next?</strong></p>
-        <p>You will receive check-in instructions 24-48 hours before your arrival. If you have any questions or special requests, please contact us.</p>
-        
-        <p>We look forward to hosting you!</p>
-        <p>Best regards,<br>SmartStayz Team</p>
-    ";
-    
-    $mailHandler->send(
-        $bookingData['email'],
-        "Payment Confirmed - {$propertyName}",
-        $emailBody
-    );
-}
-
-/**
- * Send payment failed email
- */
-function sendPaymentFailedEmail($bookingData, $errorMessage) {
-    require_once 'MailHandler.php';
-    require_once 'config.php';
-    
-    $mailHandler = new MailHandler();
-    $property = PROPERTIES[$bookingData['property']] ?? ['name' => 'Unknown Property'];
-    $propertyName = is_array($property) ? $property['name'] : $property;
-    $firstName = $bookingData['first_name'] ?? '';
-    $lastName = $bookingData['last_name'] ?? '';
-    $bookingId = $bookingData['booking_id'] ?? '';
-    $checkIn = $bookingData['check_in'] ?? '';
-    $checkOut = $bookingData['check_out'] ?? '';
-    
-    $emailBody = "
-        <h2>❌ Payment Failed</h2>
-        <p>Hello {$firstName} {$lastName},</p>
-        <p>Unfortunately, your payment for <strong>{$propertyName}</strong> could not be processed.</p>
-        
-        <h3>Booking Details</h3>
-        <ul>
-            <li><strong>Booking ID:</strong> {$bookingId}</li>
-            <li><strong>Property:</strong> {$propertyName}</li>
-            <li><strong>Check-in:</strong> {$checkIn}</li>
-            <li><strong>Check-out:</strong> {$checkOut}</li>
-            <li><strong>Amount:</strong> \${$bookingData['amount']}</li>
-        </ul>
-        
-        <p><strong>Error:</strong> {$errorMessage}</p>
-        
-        <p><strong>What Should You Do?</strong></p>
-        <ul>
-            <li>Check your payment method details and try again</li>
-            <li>Try a different payment method</li>
-            <li>Contact your bank if the issue persists</li>
-            <li>Contact us for assistance</li>
-        </ul>
-        
-        <p>Please try booking again or contact us if you need help.</p>
-        <p>Best regards,<br>SmartStayz Team</p>
-    ";
-    
-    $mailHandler->send(
-        $bookingData['email'],
-        "Payment Failed - {$propertyName}",
-        $emailBody
-    );
 }
 
 /**
