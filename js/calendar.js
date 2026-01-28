@@ -327,6 +327,9 @@ function bookPropertyWithDates(propertyId, checkIn, checkOut) {
 }
 
 /**
+ * Refresh calendar data every 30 minutes
+ */
+setInterval(() => {
     Object.keys(PROPERTY_ICAL_URLS).forEach(propertyId => {
         loadCalendarData(propertyId);
     });
