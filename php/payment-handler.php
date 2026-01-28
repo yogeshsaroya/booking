@@ -111,11 +111,18 @@ function handlePaymentConfirmation($data) {
         throw new Exception('Booking ID is required');
     }
     
-    // Update booking status to confirmed
+    // Update booking status to pending
     updateBooking($bookingId, [
-        'status' => 'confirmed',
+        'status' => 'pending',
         'stripe_payment_intent' => $paymentIntentId
     ]);
+    
+    // Send booking received email
+    $bookingFile = __DIR__ . "/bookings/{$bookingId}.json";
+    if (file_exists($bookingFile)) {
+        $bookingData = json_decode(file_get_contents($bookingFile), true);
+        sendBookingReceivedEmail($bookingData);
+    }
     
     echo json_encode([
         'success' => true,
@@ -376,6 +383,37 @@ function updateBooking($bookingId, $updates) {
         $bookingData = array_merge($bookingData, $updates);
         file_put_contents($bookingFile, json_encode($bookingData, JSON_PRETTY_PRINT));
     }
+}
+
+/**
+ * Send booking received email (payment processing)
+ */
+function sendBookingReceivedEmail($bookingData) {
+    $property = PROPERTIES[$bookingData['property']] ?? ['name' => 'Unknown Property'];
+    
+    $message = "
+    <h2>Booking Received - Payment Processing</h2>
+    <p>Hello {$bookingData['firstName']} {$bookingData['lastName']},</p>
+    <p>Thank you for booking <strong>{$property['name']}</strong>! We have received your booking request and are processing your payment.</p>
+    
+    <h3>Booking Details</h3>
+    <ul>
+        <li><strong>Booking ID:</strong> {$bookingData['bookingId']}</li>
+        <li><strong>Property:</strong> {$property['name']}</li>
+        <li><strong>Check-in:</strong> {$bookingData['checkIn']}</li>
+        <li><strong>Check-out:</strong> {$bookingData['checkOut']}</li>
+        <li><strong>Guests:</strong> {$bookingData['guests']}</li>
+        <li><strong>Total Amount:</strong> \${$bookingData['amount']}</li>
+    </ul>
+    
+    <p><strong>Status:</strong> Payment is being processed. You will receive a confirmation email shortly once payment is verified.</p>
+    
+    <p>If you have any questions, please contact us with your booking ID.</p>
+    <p>Best regards,<br>SmartStayz Team</p>
+    ";
+    
+    $mailHandler = new MailHandler();
+    $mailHandler->send($bookingData['email'], "Booking Received - {$property['name']}", $message);
 }
 
 /**

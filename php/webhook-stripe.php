@@ -111,6 +111,13 @@ function handlePaymentIntentFailed($paymentIntent) {
         'status' => 'failed',
         'payment_error' => $paymentIntent->last_payment_error['message'] ?? 'Payment failed'
     ]);
+    
+    // Send payment failed email
+    $bookingFile = __DIR__ . "/bookings/{$bookingId}.json";
+    if (file_exists($bookingFile)) {
+        $bookingData = json_decode(file_get_contents($bookingFile), true);
+        sendPaymentFailedEmail($bookingData, $paymentIntent->last_payment_error['message'] ?? 'Payment failed');
+    }
 }
 
 /**
@@ -169,31 +176,85 @@ function updateBooking($bookingId, $updates) {
  */
 function sendConfirmationEmail($bookingData) {
     require_once 'MailHandler.php';
+    require_once 'config.php';
     
     $mailHandler = new MailHandler();
-    $property = $bookingData['property'] ?? 'Unknown';
+    $property = PROPERTIES[$bookingData['property']] ?? ['name' => 'Unknown Property'];
+    $propertyName = is_array($property) ? $property['name'] : $property;
     
     $emailBody = "
-        <h2>Booking Confirmed!</h2>
+        <h2>✅ Payment Confirmed - Booking Complete!</h2>
         <p>Hello {$bookingData['firstName']} {$bookingData['lastName']},</p>
-        <p>Your booking for <strong>{$property}</strong> has been confirmed.</p>
+        <p><strong>Great news!</strong> Your payment has been successfully processed and your booking is now confirmed.</p>
         
         <h3>Booking Details</h3>
         <ul>
+            <li><strong>Booking ID:</strong> {$bookingData['bookingId']}</li>
+            <li><strong>Property:</strong> {$propertyName}</li>
             <li><strong>Check-in:</strong> {$bookingData['checkIn']}</li>
             <li><strong>Check-out:</strong> {$bookingData['checkOut']}</li>
             <li><strong>Guests:</strong> {$bookingData['guests']}</li>
-            <li><strong>Total Amount:</strong> \${$bookingData['amount']}</li>
+            <li><strong>Total Amount Paid:</strong> \${$bookingData['amount']}</li>
         </ul>
         
-        <p>Further instructions will be sent shortly.</p>
+        <p><strong>What's Next?</strong></p>
+        <p>You will receive check-in instructions 24-48 hours before your arrival. If you have any questions or special requests, please contact us.</p>
+        
+        <p>We look forward to hosting you!</p>
         <p>Best regards,<br>SmartStayz Team</p>
     ";
     
     $mailHandler->sendEmail(
         $bookingData['email'],
         "{$bookingData['firstName']} {$bookingData['lastName']}",
-        "Booking Confirmed - {$property}",
+        "Payment Confirmed - {$propertyName}",
+        $emailBody
+    );
+}
+
+/**
+ * Send payment failed email
+ */
+function sendPaymentFailedEmail($bookingData, $errorMessage) {
+    require_once 'MailHandler.php';
+    require_once 'config.php';
+    
+    $mailHandler = new MailHandler();
+    $property = PROPERTIES[$bookingData['property']] ?? ['name' => 'Unknown Property'];
+    $propertyName = is_array($property) ? $property['name'] : $property;
+    
+    $emailBody = "
+        <h2>❌ Payment Failed</h2>
+        <p>Hello {$bookingData['firstName']} {$bookingData['lastName']},</p>
+        <p>Unfortunately, your payment for <strong>{$propertyName}</strong> could not be processed.</p>
+        
+        <h3>Booking Details</h3>
+        <ul>
+            <li><strong>Booking ID:</strong> {$bookingData['bookingId']}</li>
+            <li><strong>Property:</strong> {$propertyName}</li>
+            <li><strong>Check-in:</strong> {$bookingData['checkIn']}</li>
+            <li><strong>Check-out:</strong> {$bookingData['checkOut']}</li>
+            <li><strong>Amount:</strong> \${$bookingData['amount']}</li>
+        </ul>
+        
+        <p><strong>Error:</strong> {$errorMessage}</p>
+        
+        <p><strong>What Should You Do?</strong></p>
+        <ul>
+            <li>Check your payment method details and try again</li>
+            <li>Try a different payment method</li>
+            <li>Contact your bank if the issue persists</li>
+            <li>Contact us for assistance</li>
+        </ul>
+        
+        <p>Please try booking again or contact us if you need help.</p>
+        <p>Best regards,<br>SmartStayz Team</p>
+    ";
+    
+    $mailHandler->sendEmail(
+        $bookingData['email'],
+        "{$bookingData['firstName']} {$bookingData['lastName']}",
+        "Payment Failed - {$propertyName}",
         $emailBody
     );
 }
