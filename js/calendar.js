@@ -293,10 +293,9 @@ function updateCalendarSelection(propertyId) {
     const bookBtn = document.getElementById(`bookBtn-${propertyId}`);
     
     if (!dates.checkIn) {
-        // Hide message and disable button
+        // Hide success message and disable button
+        // Keep error message visible if it's showing
         if (messageDiv) messageDiv.style.display = 'none';
-        const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
-        if (errorMsg) errorMsg.style.display = 'none';
         if (bookBtn) bookBtn.disabled = true;
         return;
     }
@@ -328,6 +327,9 @@ function updateCalendarSelection(propertyId) {
             document.getElementById(`checkOutDisplay-${propertyId}`).textContent = dates.checkOut;
             messageDiv.style.display = 'block';
             bookBtn.disabled = false;
+            // Hide error message when valid dates are selected
+            const errorMsg = document.getElementById(`errorMessage-${propertyId}`);
+            if (errorMsg) errorMsg.style.display = 'none';
         } else if (dates.checkIn) {
             // Only check-in selected, hide message but keep button disabled
             messageDiv.style.display = 'none';
