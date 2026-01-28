@@ -228,11 +228,6 @@ function handleDayClick(propertyId, dateString) {
             if (!hasBlockedDatesBetween(propertyId, dates.checkIn, dateString)) {
                 dates.checkOut = dateString;
                 updateCalendarSelection(propertyId);
-                
-                // Ask if user wants to book
-                if (confirm(`Book from ${dates.checkIn} to ${dates.checkOut}?`)) {
-                    bookPropertyWithDates(propertyId, dates.checkIn, dates.checkOut);
-                }
             } else {
                 alert('There are booked dates in your selected range. Please choose different dates.');
                 dates.checkIn = null;
