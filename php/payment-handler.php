@@ -61,18 +61,18 @@ try {
 function handleStripePayment($data) {
     Stripe::setApiKey(STRIPE_SECRET_KEY);
     
-    // Validate booking data
+    // Step 1: Validate all data FIRST
     validateBookingData($data);
     
-    // Check availability
+    // Step 2: Check availability BEFORE creating anything
     if (!isDateRangeAvailable($data['property'], $data['checkIn'], $data['checkOut'])) {
         throw new Exception('Selected dates are no longer available');
     }
     
-    // Generate booking ID first (needed for PaymentIntent metadata)
+    // Step 3: Generate booking ID
     $bookingId = uniqid('BOOK-', true);
     
-    // Create Stripe PaymentIntent FIRST
+    // Step 4: Create Stripe PaymentIntent (if this fails, nothing gets created)
     try {
         $paymentIntent = PaymentIntent::create([
             'amount' => $data['amount'] * 100, // Convert to cents
@@ -95,19 +95,22 @@ function handleStripePayment($data) {
         throw new Exception('Payment initialization failed. Please try again.');
     }
     
-    // Only create booking record if PaymentIntent was successful
+    // Step 5: ONLY create booking record if everything above passed
     try {
         createBookingWithId($bookingId, $data, 'pending', $paymentIntent->id);
+        // Booking created successfully - admin email is sent inside createBookingWithId
     } catch (Exception $e) {
-        // If booking creation fails, cancel the PaymentIntent
+        // If booking creation fails, cancel the PaymentIntent to clean up
         try {
             $paymentIntent->cancel();
+            logMessage("PaymentIntent cancelled after booking creation failed: {$bookingId}", 'INFO');
         } catch (Exception $cancelError) {
             logMessage("Failed to cancel PaymentIntent: " . $cancelError->getMessage(), 'WARNING');
         }
-        throw $e;
+        throw new Exception('Failed to create booking. Please try again.');
     }
     
+    // Step 6: Return success response
     echo json_encode([
         'success' => true,
         'clientSecret' => $paymentIntent->client_secret,
