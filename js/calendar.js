@@ -284,7 +284,16 @@ function updateCalendarSelection(propertyId) {
         day.classList.remove('selected', 'in-range');
     });
     
-    if (!dates.checkIn) return;
+    // Update message and button
+    const messageDiv = document.getElementById(`selectedDates-${propertyId}`);
+    const bookBtn = document.getElementById(`bookBtn-${propertyId}`);
+    
+    if (!dates.checkIn) {
+        // Hide message and disable button
+        if (messageDiv) messageDiv.style.display = 'none';
+        if (bookBtn) bookBtn.disabled = true;
+        return;
+    }
     
     // Highlight check-in
     days.forEach(day => {
@@ -305,6 +314,20 @@ function updateCalendarSelection(propertyId) {
             }
         }
     });
+    
+    // Show message and update button when dates are selected
+    if (messageDiv && bookBtn) {
+        if (dates.checkIn && dates.checkOut) {
+            document.getElementById(`checkInDisplay-${propertyId}`).textContent = dates.checkIn;
+            document.getElementById(`checkOutDisplay-${propertyId}`).textContent = dates.checkOut;
+            messageDiv.style.display = 'block';
+            bookBtn.disabled = false;
+        } else if (dates.checkIn) {
+            // Only check-in selected, hide message but keep button disabled
+            messageDiv.style.display = 'none';
+            bookBtn.disabled = true;
+        }
+    }
 }
 
 /**
