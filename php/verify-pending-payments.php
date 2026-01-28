@@ -2,7 +2,7 @@
 /**
  * SmartStayz Payment Verification Cron Job
  * Verifies pending payments against Stripe to catch any missed webhooks
- * Run this via cron job every 5-10 minutes: * /5 * * * * php /path/to/verify-pending-payments.php
+ * Run this via cron job every 5-10 minutes: */5 * * * * php /path/to/verify-pending-payments.php
  */
 
 require_once 'config.php';
@@ -14,21 +14,29 @@ use Stripe\PaymentIntent;
 // Set Stripe API key
 Stripe::setApiKey(STRIPE_SECRET_KEY);
 
+$output = [];
+$output[] = "=== Starting Payment Verification ===";
+$output[] = "Timestamp: " . date('Y-m-d H:i:s');
+$output[] = "";
+
+echo implode("\n", $output);
 logMessage("=== Starting Payment Verification ===", 'INFO');
 
 try {
     // Get all pending bookings with Stripe payment intent
+    echo "Connecting to database...\n";
     $pdo = new PDO(
         'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME,
         DB_USER,
         DB_PASS
     );
+    echo "✓ Database connected\n";
     
+    echo "Fetching pending bookings...\n";
     $stmt = $pdo->prepare("
         SELECT booking_id, stripe_payment_intent 
         FROM bookings 
         WHERE status = 'pending' 
-        AND payment_status = 'pending'
         AND payment_method = 'stripe'
         AND stripe_payment_intent IS NOT NULL
         AND stripe_payment_intent != ''
@@ -37,7 +45,22 @@ try {
     $stmt->execute();
     $pendingBookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    logMessage("Found " . count($pendingBookings) . " pending bookings to verify", 'INFO');
+    $message = "Found " . count($pendingBookings) . " pending bookings to verify";
+    echo "✓ $message\n";
+    logMessage($message, 'INFO');
+    
+    if (empty($pendingBookings)) {
+        echo "No pending bookings found. Exiting.\n";
+        echo "\n=== Payment Verification Complete ===\n";
+        logMessage("=== Payment Verification Complete ===", 'INFO');
+        exit;
+    }
+    
+    $successCount = 0;
+    $failureCount = 0;
+    $errorCount = 0;
+    
+    echo "\n--- Processing Bookings ---\n";
     
     foreach ($pendingBookings as $booking) {
         $bookingId = $booking['booking_id'];
@@ -45,17 +68,20 @@ try {
         
         try {
             // Fetch payment intent from Stripe
+            echo "\nBooking ID: $bookingId\n";
+            echo "  Payment Intent: $paymentIntentId\n";
             $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
             
+            echo "  Stripe Status: {$paymentIntent->status}\n";
             logMessage("Checking booking $bookingId - PaymentIntent: $paymentIntentId - Status: {$paymentIntent->status}", 'INFO');
             
             // If payment succeeded, update booking
             if ($paymentIntent->status === 'succeeded') {
+                echo "  ✓ Payment SUCCEEDED - Updating booking to confirmed...\n";
                 logMessage("Payment verified for booking $bookingId - Updating status to confirmed", 'INFO');
                 
                 updateBooking($bookingId, [
                     'status' => 'confirmed',
-                    'payment_status' => 'paid',
                     'stripe_payment_intent' => $paymentIntentId,
                     'confirmed_at' => date('Y-m-d H:i:s'),
                     'verification_method' => 'cron_job'
@@ -67,28 +93,42 @@ try {
                     $bookingData = json_decode(file_get_contents($bookingFile), true);
                     if ($bookingData['email']) {
                         sendConfirmationEmail($bookingData);
+                        echo "  ✓ Confirmation email sent to {$bookingData['email']}\n";
                         logMessage("Confirmation email sent for booking $bookingId", 'INFO');
                     }
                 }
+                $successCount++;
             }
             // If payment failed, update booking status
             elseif ($paymentIntent->status === 'requires_payment_method') {
+                echo "  ⚠ Payment REQUIRES ACTION - Marking as failed...\n";
                 logMessage("Payment requires action for booking $bookingId", 'WARNING');
                 updateBooking($bookingId, [
                     'status' => 'failed',
-                    'payment_status' => 'failed',
                     'payment_error' => 'Payment requires payment method'
                 ]);
+                $failureCount++;
+            } else {
+                echo "  ℹ Payment status: {$paymentIntent->status} (no action needed)\n";
             }
             
         } catch (Exception $e) {
+            echo "  ✗ ERROR: " . $e->getMessage() . "\n";
             logMessage("Error verifying booking $bookingId: " . $e->getMessage(), 'ERROR');
+            $errorCount++;
         }
     }
     
+    echo "\n--- Summary ---\n";
+    echo "Bookings Processed: " . count($pendingBookings) . "\n";
+    echo "✓ Confirmed: $successCount\n";
+    echo "⚠ Failed: $failureCount\n";
+    echo "✗ Errors: $errorCount\n";
+    echo "\n=== Payment Verification Complete ===\n";
     logMessage("=== Payment Verification Complete ===", 'INFO');
     
 } catch (Exception $e) {
+    echo "✗ FATAL ERROR: " . $e->getMessage() . "\n";
     logMessage("Cron job error: " . $e->getMessage(), 'ERROR');
 }
 

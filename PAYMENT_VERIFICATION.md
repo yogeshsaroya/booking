@@ -105,6 +105,8 @@ A background cron job that:
    */10 * * * * php /Applications/MAMP/htdocs/joseph/booking/php/verify-pending-payments.php
    ```
 
+   php /home/smartstayz/booking/php/verify-pending-payments.php
+
 2. **Or use a web-based scheduler** (if you don't have cron access):
    - Set up an external service like Easycron or EasyCron
    - Configure it to call: `https://yourdomain.com/php/verify-pending-payments.php` every 5-10 minutes
