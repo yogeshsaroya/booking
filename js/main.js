@@ -282,7 +282,7 @@ function filterProperties() {
                 console.log('  Property', propertyId, 'available:', isAvailable);
                 
                 if (isAvailable) {
-                    document.getElementById(`property-${propertyId}`).style.display = 'flex';
+                    document.getElementById(`property-${propertyId}`).style.setProperty('display', 'flex', 'important');
                     availableCount++;
                 } else {
                     document.getElementById(`property-${propertyId}`).style.display = 'none';
@@ -290,13 +290,13 @@ function filterProperties() {
             } catch (error) {
                 console.error('Error checking availability for', propertyId, ':', error);
                 // If there's an error, show the property anyway
-                document.getElementById(`property-${propertyId}`).style.display = 'flex';
+                document.getElementById(`property-${propertyId}`).style.setProperty('display', 'flex', 'important');
                 availableCount++;
             }
         } else {
             // If calendarManager not available, show all properties
             console.log('  calendarManager not available, showing all');
-            document.getElementById(`property-${propertyId}`).style.display = 'flex';
+            document.getElementById(`property-${propertyId}`).style.setProperty('display', 'flex', 'important');
             availableCount++;
         }
     });
