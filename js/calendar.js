@@ -254,6 +254,12 @@ CalendarManager.prototype.renderCalendar = function(propertyId) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
+    // Get selected date range for this property
+    const selectedCheckIn = this.selectedDates[propertyId]?.checkIn;
+    const selectedCheckOut = this.selectedDates[propertyId]?.checkOut;
+    const checkInDate = selectedCheckIn ? new Date(selectedCheckIn) : null;
+    const checkOutDate = selectedCheckOut ? new Date(selectedCheckOut) : null;
+    
     for (let day = 1; day <= daysInMonth; day++) {
         const currentDate = new Date(year, monthIndex, day);
         const dateString = formatDate(currentDate);
@@ -269,6 +275,25 @@ CalendarManager.prototype.renderCalendar = function(propertyId) {
             dayClass += ' unavailable';
         }
         
+        // Check if date is in selected range
+        if (checkInDate && checkOutDate) {
+            const currentTime = currentDate.getTime();
+            const checkInTime = checkInDate.getTime();
+            const checkOutTime = checkOutDate.getTime();
+            
+            if (currentTime >= checkInTime && currentTime <= checkOutTime) {
+                dayClass += ' selected';
+                
+                // Add special classes for check-in and check-out dates
+                if (currentTime === checkInTime) {
+                    dayClass += ' check-in';
+                }
+                if (currentTime === checkOutTime) {
+                    dayClass += ' check-out';
+                }
+            }
+        }
+        
         calendarHTML += `<div class="${dayClass}" data-date="${dateString}">${day}</div>`;
     }
     
@@ -282,6 +307,10 @@ CalendarManager.prototype.renderCalendar = function(propertyId) {
                 <div class="legend-item">
                     <div class="legend-box unavailable"></div>
                     <span>Booked</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box selected"></div>
+                    <span>Your Selection</span>
                 </div>
             </div>
         </div>

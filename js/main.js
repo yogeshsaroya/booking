@@ -335,10 +335,33 @@ function filterProperties() {
         }, 100);
     }
     
-    // Highlight dates in calendars
+    // Highlight dates in calendars and navigate to selected month
     if (window.highlightDateRange) {
         console.log('Calling highlightDateRange');
         window.highlightDateRange(checkIn, checkOut);
+    }
+    
+    // Navigate calendars to the check-in month and highlight selected dates
+    if (window.calendarManager) {
+        const checkInDate = new Date(checkIn);
+        const propertyIds = ['stone', 'copper', 'cedar'];
+        
+        propertyIds.forEach(propertyId => {
+            // Set calendar to show check-in month
+            window.calendarManager.currentMonth[propertyId] = new Date(checkInDate.getFullYear(), checkInDate.getMonth(), 1);
+            
+            // Set selected dates for this property
+            window.calendarManager.selectedDates[propertyId] = {
+                checkIn: checkIn,
+                checkOut: checkOut
+            };
+            
+            // Re-render the calendar to show the selected month
+            if (document.getElementById(`property-${propertyId}`) && 
+                document.getElementById(`property-${propertyId}`).style.display !== 'none') {
+                window.calendarManager.renderCalendar(propertyId);
+            }
+        });
     }
 }
 
@@ -356,13 +379,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Search button clicked - calling filterProperties');
             filterProperties();
         });
-    }
-    
-    if (checkInInput) {
-        checkInInput.addEventListener('change', filterProperties);
-    }
-    if (checkOutInput) {
-        checkOutInput.addEventListener('change', filterProperties);
     }
     
     // Hide all properties by default on page load - show only when searched

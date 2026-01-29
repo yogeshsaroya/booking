@@ -156,7 +156,7 @@
                     </div>
 
                     <div class="booking-action">
-                        <button class="btn btn-primary btn-large" id="bookBtn-stone" onclick="bookPropertyWithDates('stone', selectedDates.stone.checkIn, selectedDates.stone.checkOut, 1)" disabled style="width: 100%;">Book Now</button>
+                        <button class="btn btn-primary btn-large" id="bookBtn-stone" onclick="bookPropertyWithDates('stone', selectedDates.stone.checkIn, selectedDates.stone.checkOut, document.getElementById('guests')?.value || '2')" disabled style="width: 100%;">Book Now</button>
                     </div>
                 </div>
             </article>
@@ -233,7 +233,7 @@
                     </div>
 
                     <div class="booking-action">
-                        <button class="btn btn-primary btn-large" id="bookBtn-copper" onclick="bookPropertyWithDates('copper', selectedDates.copper.checkIn, selectedDates.copper.checkOut, 1)" disabled style="width: 100%;">Book Now</button>
+                        <button class="btn btn-primary btn-large" id="bookBtn-copper" onclick="bookPropertyWithDates('copper', selectedDates.copper.checkIn, selectedDates.copper.checkOut, document.getElementById('guests')?.value || '2')" disabled style="width: 100%;">Book Now</button>
                     </div>
                 </div>
             </article>
@@ -311,7 +311,7 @@
                     </div>
 
                     <div class="booking-action">
-                        <button class="btn btn-primary btn-large" id="bookBtn-cedar" onclick="bookPropertyWithDates('cedar', selectedDates.cedar.checkIn, selectedDates.cedar.checkOut, 1)" disabled style="width: 100%;">Book Now</button>
+                        <button class="btn btn-primary btn-large" id="bookBtn-cedar" onclick="bookPropertyWithDates('cedar', selectedDates.cedar.checkIn, selectedDates.cedar.checkOut, document.getElementById('guests')?.value || '2')" disabled style="width: 100%;">Book Now</button>
                     </div>
                 </div>
             </article>
