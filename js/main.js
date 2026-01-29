@@ -148,10 +148,28 @@ function bookProperty(propertyId) {
         // Validate dates
         const checkInDate = new Date(checkIn);
         const checkOutDate = new Date(checkOut);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         
+        // Check if check-in is in past
+        if (checkInDate < today) {
+            alert('Check-in date cannot be in the past');
+            return;
+        }
+        
+        // Check if checkout is after checkin
         if (checkOutDate <= checkInDate) {
             alert('Check-out date must be after check-in date');
             return;
+        }
+        
+        // Check if property is available
+        if (window.calendarManager && window.calendarManager.isDateRangeAvailable) {
+            const isAvailable = window.calendarManager.isDateRangeAvailable(propertyId, checkIn, checkOut);
+            if (!isAvailable) {
+                alert('This property is not available for the selected dates');
+                return;
+            }
         }
         
         url += `&checkIn=${checkIn}&checkOut=${checkOut}`;
@@ -161,34 +179,203 @@ function bookProperty(propertyId) {
 }
 
 /**
- * Check availability for selected dates
+ * Filter properties by availability for selected dates
  */
-document.getElementById('searchBtn')?.addEventListener('click', function() {
+/**
+ * Filter properties by availability for selected dates
+ */
+function filterProperties() {
+    console.log('filterProperties called');
     const checkIn = document.getElementById('checkIn')?.value;
     const checkOut = document.getElementById('checkOut')?.value;
+    const filterError = document.getElementById('filterError');
+    const noPropertiesMessage = document.getElementById('noPropertiesMessage');
     
+    console.log('Check-in:', checkIn, 'Check-out:', checkOut);
+    
+    // Clear previous error
+    if (filterError) {
+        filterError.innerHTML = '';
+        filterError.style.display = 'none';
+    }
+    
+    // Get all property cards
+    const propertyCards = document.querySelectorAll('.property-detail-card');
+    console.log('Found', propertyCards.length, 'property cards');
+    
+    // If no dates selected, hide all properties
     if (!checkIn || !checkOut) {
-        alert('Please select both check-in and check-out dates');
+        console.log('No dates selected, hiding all properties');
+        const propertyIds = ['stone', 'copper', 'cedar'];
+        propertyIds.forEach(id => {
+            const card = document.getElementById(`property-${id}`);
+            if (card) card.style.display = 'none';
+        });
+        if (noPropertiesMessage) {
+            noPropertiesMessage.style.display = 'block';
+        }
         return;
     }
     
+    // Validate dates
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
-    if (checkOutDate <= checkInDate) {
-        alert('Check-out date must be after check-in date');
+    // Check if dates are in the past
+    if (checkInDate < today) {
+        if (filterError) {
+            filterError.innerHTML = '<p>✗ Check-in date cannot be in the past</p>';
+            filterError.style.display = 'block';
+        }
+        const propertyIds = ['stone', 'copper', 'cedar'];
+        propertyIds.forEach(id => {
+            const card = document.getElementById(`property-${id}`);
+            if (card) card.style.display = 'none';
+        });
+        if (noPropertiesMessage) {
+            noPropertiesMessage.style.display = 'block';
+        }
         return;
     }
     
-    // Scroll to first property
-    const firstProperty = document.querySelector('.property-detail-card');
-    if (firstProperty) {
-        firstProperty.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Check if checkout is after checkin (minimum 1 night)
+    if (checkOutDate <= checkInDate) {
+        if (filterError) {
+            filterError.innerHTML = '<p>✗ Check-out date must be at least 1 night after check-in</p>';
+            filterError.style.display = 'block';
+        }
+        const propertyIds = ['stone', 'copper', 'cedar'];
+        propertyIds.forEach(id => {
+            const card = document.getElementById(`property-${id}`);
+            if (card) card.style.display = 'none';
+        });
+        if (noPropertiesMessage) {
+            noPropertiesMessage.style.display = 'block';
+        }
+        return;
+    }
+    
+    // Check availability for each property using calendarManager
+    let availableCount = 0;
+    console.log('calendarManager available:', !!window.calendarManager);
+    console.log('isDateRangeAvailable method exists:', !!(window.calendarManager && window.calendarManager.isDateRangeAvailable));
+    
+    // Show calendar data status
+    if (window.calendarManager) {
+        console.log('Blocked dates loaded:', {
+            stone: window.calendarManager.blockedDates.stone.length,
+            copper: window.calendarManager.blockedDates.copper.length,
+            cedar: window.calendarManager.blockedDates.cedar.length
+        });
+    }
+    
+    propertyCards.forEach(card => {
+        const propertyId = card.getAttribute('data-property-id');
+        console.log('Checking property:', propertyId);
+        
+        // Check if property is available for the date range
+        if (window.calendarManager && window.calendarManager.isDateRangeAvailable) {
+            try {
+                const isAvailable = window.calendarManager.isDateRangeAvailable(propertyId, checkIn, checkOut);
+                console.log('  Property', propertyId, 'available:', isAvailable);
+                
+                if (isAvailable) {
+                    document.getElementById(`property-${propertyId}`).style.display = 'flex';
+                    availableCount++;
+                } else {
+                    document.getElementById(`property-${propertyId}`).style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error checking availability for', propertyId, ':', error);
+                // If there's an error, show the property anyway
+                document.getElementById(`property-${propertyId}`).style.display = 'flex';
+                availableCount++;
+            }
+        } else {
+            // If calendarManager not available, show all properties
+            console.log('  calendarManager not available, showing all');
+            document.getElementById(`property-${propertyId}`).style.display = 'flex';
+            availableCount++;
+        }
+    });
+    
+    // Show/hide no properties message
+    console.log('Available count:', availableCount);
+    if (availableCount === 0) {
+        console.log('No properties available, showing message');
+        if (noPropertiesMessage) {
+            noPropertiesMessage.innerHTML = '<p>No properties available for the selected dates. Please try different dates.</p>';
+            noPropertiesMessage.style.display = 'block';
+        }
+    } else {
+        console.log('Available properties found, hiding message');
+        if (noPropertiesMessage) {
+            noPropertiesMessage.style.display = 'none';
+        }
+    }
+    
+    // Scroll to first available property
+    const propertyIds = ['stone', 'copper', 'cedar'];
+    let firstAvailable = null;
+    for (let id of propertyIds) {
+        const card = document.getElementById(`property-${id}`);
+        if (card && card.style.display !== 'none') {
+            firstAvailable = card;
+            break;
+        }
+    }
+    
+    console.log('First available property:', firstAvailable);
+    if (firstAvailable) {
+        setTimeout(() => {
+            console.log('Scrolling to first available property');
+            firstAvailable.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     }
     
     // Highlight dates in calendars
     if (window.highlightDateRange) {
+        console.log('Calling highlightDateRange');
         window.highlightDateRange(checkIn, checkOut);
+    }
+}
+
+/**
+ * Add real-time filtering on date input change
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const checkInInput = document.getElementById('checkIn');
+    const checkOutInput = document.getElementById('checkOut');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    // Add event listener for search button
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            console.log('Search button clicked - calling filterProperties');
+            filterProperties();
+        });
+    }
+    
+    if (checkInInput) {
+        checkInInput.addEventListener('change', filterProperties);
+    }
+    if (checkOutInput) {
+        checkOutInput.addEventListener('change', filterProperties);
+    }
+    
+    // Hide all properties by default on page load - show only when searched
+    const propertyIds = ['stone', 'copper', 'cedar'];
+    propertyIds.forEach(id => {
+        const card = document.getElementById(`property-${id}`);
+        if (card) card.style.display = 'none';
+    });
+    
+    // Show initial message
+    const noPropertiesMessage = document.getElementById('noPropertiesMessage');
+    if (noPropertiesMessage) {
+        noPropertiesMessage.style.display = 'block';
     }
 });
 

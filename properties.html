@@ -10,6 +10,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Karla:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Hide property cards by default - show only when searched */
+        .no-properties-message {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -62,6 +70,7 @@
                     </select>
                 </div>
                 <button class="btn btn-primary" id="searchBtn">Check Availability</button>
+                <div class="filter-error" id="filterError"></div>
             </div>
         </div>
     </section>
@@ -69,9 +78,12 @@
     <!-- Properties Listing -->
     <section class="properties-listing">
         <div class="container">
+            <div class="no-properties-message" id="noPropertiesMessage">
+                <p>Please select check-in and check-out dates above to see available properties.</p>
+            </div>
             
             <!-- The Stone Property -->
-            <article class="property-detail-card" data-property-id="stone">
+            <article id="property-stone" class="property-detail-card" data-property-id="stone">
                 <div class="property-images">
                     
                     <div class="main-image">
@@ -150,7 +162,7 @@
             </article>
 
             <!-- The Copper Property -->
-            <article class="property-detail-card" data-property-id="copper">
+            <article id="property-copper" class="property-detail-card" data-property-id="copper">
                 <div class="property-images">
                     <div class="main-image">
                         <img src="images/airbnb-photos/copper/01-hero.jpg" alt="The Copper Main Image">
@@ -227,7 +239,7 @@
             </article>
 
             <!-- The Cedar Property -->
-            <article class="property-detail-card" data-property-id="cedar">
+            <article id="property-cedar" class="property-detail-card" data-property-id="cedar">
                 <div class="property-images">
                     
                     <div class="main-image">
