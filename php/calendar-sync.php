@@ -11,6 +11,7 @@ header('Content-Type: application/json');
 
 // Get property ID from request
 $propertyId = $_GET['property'] ?? null;
+$clearCache = $_GET['clear_cache'] ?? false;
 
 if (!$propertyId || !isset(PROPERTY_ICAL_URLS[$propertyId])) {
     echo json_encode([
@@ -18,6 +19,15 @@ if (!$propertyId || !isset(PROPERTY_ICAL_URLS[$propertyId])) {
         'error' => 'Invalid property ID'
     ]);
     exit;
+}
+
+// Clear cache if requested
+if ($clearCache) {
+    $cacheFile = CACHE_DIR . "/calendar_{$propertyId}.json";
+    if (file_exists($cacheFile)) {
+        unlink($cacheFile);
+        logMessage("Cache cleared for $propertyId", 'INFO');
+    }
 }
 
 try {
@@ -55,15 +65,23 @@ function getBlockedDates($propertyId) {
         }
     }
     
-    // Fetch fresh data
+    // Fetch fresh data from iCal
     $icalUrl = PROPERTY_ICAL_URLS[$propertyId];
     $icalData = fetchICalData($icalUrl);
     
-    if (!$icalData) {
-        throw new Exception('Failed to fetch iCal data');
+    $icalBlockedDates = [];
+    if ($icalData) {
+        $icalBlockedDates = parseICalData($icalData);
+    } else {
+        logMessage("Failed to fetch iCal data for $propertyId, continuing with database only", 'WARNING');
     }
     
-    $blockedDates = parseICalData($icalData);
+    // Get blocked dates from database bookings
+    $dbBlockedDates = getBlockedDatesFromDatabase($propertyId);
+    
+    // Merge both sources and remove duplicates
+    $blockedDates = array_unique(array_merge($icalBlockedDates, $dbBlockedDates));
+    sort($blockedDates);
     
     // Cache the results
     $cacheData = [
@@ -71,6 +89,60 @@ function getBlockedDates($propertyId) {
         'timestamp' => time()
     ];
     file_put_contents($cacheFile, json_encode($cacheData));
+    
+    return $blockedDates;
+}
+
+/**
+ * Get blocked dates from database bookings
+ */
+function getBlockedDatesFromDatabase($propertyId) {
+    $blockedDates = [];
+    
+    try {
+        $pdo = getDBConnection();
+        if (!$pdo) {
+            logMessage("Database connection failed for $propertyId", 'WARNING');
+            return $blockedDates;
+        }
+        
+        // Get all confirmed and pending bookings for this property
+        // We block dates for: pending, pending_bitcoin, confirmed, and paid statuses
+        // We don't block for: cancelled, failed, expired
+        $stmt = $pdo->prepare("
+            SELECT check_in, check_out, booking_id, status
+            FROM bookings 
+            WHERE property = :property 
+            AND status IN ('pending', 'pending_bitcoin', 'confirmed', 'paid')
+            AND check_out >= CURDATE()
+            ORDER BY check_in
+        ");
+        
+        $stmt->execute(['property' => $propertyId]);
+        $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        logMessage("Database query for $propertyId returned " . count($bookings) . " bookings", 'DEBUG');
+        
+        // Convert each booking to blocked date range
+        foreach ($bookings as $booking) {
+            logMessage("  Processing booking {$booking['booking_id']}: {$booking['check_in']} to {$booking['check_out']} (Status: {$booking['status']})", 'DEBUG');
+            
+            $checkIn = new DateTime($booking['check_in']);
+            $checkOut = new DateTime($booking['check_out']);
+            
+            // Block all dates from check-in to check-out (INCLUDING checkout day)
+            $current = clone $checkIn;
+            while ($current <= $checkOut) {
+                $blockedDates[] = $current->format('Y-m-d');
+                $current->modify('+1 day');
+            }
+        }
+        
+        logMessage("Found " . count($bookings) . " active bookings for $propertyId with " . count($blockedDates) . " blocked dates", 'INFO');
+        
+    } catch (Exception $e) {
+        logMessage("Failed to fetch database bookings for $propertyId: " . $e->getMessage(), 'ERROR');
+    }
     
     return $blockedDates;
 }

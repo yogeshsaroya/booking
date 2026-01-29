@@ -1,88 +1,213 @@
 /**
- * SmartStayz - Calendar Sync
- * Handles one-way iCal sync from Airbnb
+ * SmartStayz - Calendar Availability Manager
+ * Common functions for checking availability and blocking dates across all properties
+ * Handles iCal sync + Database bookings
  */
 
-// Property iCal URLs (these will be loaded from PHP config in production)
-const PROPERTY_ICAL_URLS = {
-    stone: 'php/calendar-sync.php?property=stone',
-    copper: 'php/calendar-sync.php?property=copper',
-    cedar: 'php/calendar-sync.php?property=cedar'
-};
+/**
+ * CalendarManager - Centralized calendar availability management
+ */
+class CalendarManager {
+    constructor() {
+        // Property iCal URLs
+        this.apiUrls = {
+            stone: 'php/calendar-sync.php?property=stone',
+            copper: 'php/calendar-sync.php?property=copper',
+            cedar: 'php/calendar-sync.php?property=cedar'
+        };
+        
+        // Store for blocked dates (from iCal + Database)
+        this.blockedDates = {
+            stone: [],
+            copper: [],
+            cedar: []
+        };
+        
+        // Current month display
+        this.currentMonth = {
+            stone: new Date(),
+            copper: new Date(),
+            cedar: new Date()
+        };
+        
+        // Selected date ranges
+        this.selectedDates = {
+            stone: { checkIn: null, checkOut: null },
+            copper: { checkIn: null, checkOut: null },
+            cedar: { checkIn: null, checkOut: null }
+        };
+        
+        this.cacheTimeout = 30 * 60 * 1000; // 30 minutes
+    }
+    
+    /**
+     * Load blocked dates for a property from backend
+     * Fetches dates from both iCal and database bookings
+     */
+    async loadBlockedDates(propertyId) {
+        const calendarContainer = document.querySelector(`#calendar-${propertyId} .calendar-container`);
+        
+        if (!calendarContainer) return false;
+        
+        try {
+            const response = await fetch(this.apiUrls[propertyId]);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.blockedDates[propertyId] = data.blockedDates || [];
+                console.log(`Loaded ${this.blockedDates[propertyId].length} blocked dates for ${propertyId}`);
+                return true;
+            } else {
+                this.showError(calendarContainer, 'Unable to load calendar. Please try again later.');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error loading calendar:', error);
+            this.showError(calendarContainer, 'Unable to load calendar. Please try again later.');
+            return false;
+        }
+    }
+    
+    /**
+     * Check if a specific date is blocked (booked)
+     */
+    isDateBlocked(propertyId, dateString) {
+        return this.blockedDates[propertyId].includes(dateString);
+    }
+    
+    /**
+     * Check if date range is available (no blocked dates in between)
+     */
+    isDateRangeAvailable(propertyId, startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const current = new Date(start);
+        
+        // Check each date in the range (INCLUDING checkout day)
+        while (current <= end) {
+            const dateString = this.formatDate(current);
+            if (this.isDateBlocked(propertyId, dateString)) {
+                return false;
+            }
+            current.setDate(current.getDate() + 1);
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Get blocked dates between two dates
+     */
+    getBlockedDatesInRange(propertyId, startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const current = new Date(start);
+        const blocked = [];
+        
+        current.setDate(current.getDate() + 1); // Start checking from day after check-in
+        
+        while (current < end) {
+            const dateString = this.formatDate(current);
+            if (this.isDateBlocked(propertyId, dateString)) {
+                blocked.push(dateString);
+            }
+            current.setDate(current.getDate() + 1);
+        }
+        
+        return blocked;
+    }
+    
+    /**
+     * Format date as YYYY-MM-DD
+     */
+    formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
+    /**
+     * Show error message in calendar container
+     */
+    showError(container, message) {
+        container.innerHTML = `
+            <div class="calendar-error" style="text-align: center; padding: 2rem; color: var(--stone-gray);">
+                <p>${message}</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">
+                    <a href="index.html#contact" style="color: var(--copper-accent);">Contact us</a> for availability
+                </p>
+            </div>
+        `;
+    }
+    
+    /**
+     * Refresh calendar data for all properties
+     */
+    async refreshAll() {
+        const properties = Object.keys(this.apiUrls);
+        const promises = properties.map(propertyId => this.loadBlockedDates(propertyId));
+        await Promise.all(promises);
+        
+        // Re-render all calendars
+        properties.forEach(propertyId => {
+            if (document.querySelector(`#calendar-${propertyId}`)) {
+                this.renderCalendar(propertyId);
+            }
+        });
+    }
+}
 
-// Store for calendar data
-let calendarData = {
-    stone: [],
-    copper: [],
-    cedar: []
-};
+// Create global instance
+const calendarManager = new CalendarManager();
 
-// Current month display for each calendar
-let currentMonth = {
-    stone: new Date(),
-    copper: new Date(),
-    cedar: new Date()
-};
-
-// Selected dates for each property
-let selectedDates = {
-    stone: { checkIn: null, checkOut: null },
-    copper: { checkIn: null, checkOut: null },
-    cedar: { checkIn: null, checkOut: null }
-};
+// Legacy compatibility - expose for backwards compatibility
+const PROPERTY_ICAL_URLS = calendarManager.apiUrls;
+const calendarData = calendarManager.blockedDates;
+const currentMonth = calendarManager.currentMonth;
+const selectedDates = calendarManager.selectedDates;
 
 /**
  * Initialize calendars on page load
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // Load calendar data for each property
-    Object.keys(PROPERTY_ICAL_URLS).forEach(propertyId => {
-        loadCalendarData(propertyId);
+    // Load calendar data for each property using CalendarManager
+    Object.keys(calendarManager.apiUrls).forEach(async propertyId => {
+        const loaded = await calendarManager.loadBlockedDates(propertyId);
+        if (loaded) {
+            calendarManager.renderCalendar(propertyId);
+        }
     });
+    
+    // Auto-refresh every 30 minutes
+    setInterval(() => {
+        calendarManager.refreshAll();
+    }, calendarManager.cacheTimeout);
 });
 
 /**
- * Load calendar data from backend
+ * Legacy function - now uses CalendarManager
+ * @deprecated Use calendarManager.loadBlockedDates() instead
  */
 async function loadCalendarData(propertyId) {
-    const calendarContainer = document.querySelector(`#calendar-${propertyId} .calendar-container`);
-    
-    if (!calendarContainer) return;
-    
-    try {
-        const response = await fetch(PROPERTY_ICAL_URLS[propertyId]);
-        const data = await response.json();
-        
-        if (data.success) {
-            calendarData[propertyId] = data.blockedDates || [];
-            renderCalendar(propertyId);
-        } else {
-            showCalendarError(calendarContainer, 'Unable to load calendar. Please try again later.');
-        }
-    } catch (error) {
-        console.error('Error loading calendar:', error);
-        showCalendarError(calendarContainer, 'Unable to load calendar. Please try again later.');
+    const loaded = await calendarManager.loadBlockedDates(propertyId);
+    if (loaded) {
+        calendarManager.renderCalendar(propertyId);
     }
 }
 
 /**
- * Show calendar error message
+ * Legacy function - now uses CalendarManager
+ * @deprecated Use calendarManager.showError() instead
  */
 function showCalendarError(container, message) {
-    container.innerHTML = `
-        <div class="calendar-error" style="text-align: center; padding: 2rem; color: var(--stone-gray);">
-            <p>${message}</p>
-            <p style="margin-top: 1rem; font-size: 0.9rem;">
-                <a href="index.html#contact" style="color: var(--copper-accent);">Contact us</a> for availability
-            </p>
-        </div>
-    `;
+    calendarManager.showError(container, message);
 }
 
 /**
  * Render calendar for a property
  */
-function renderCalendar(propertyId) {
+CalendarManager.prototype.renderCalendar = function(propertyId) {
     const calendarContainer = document.querySelector(`#calendar-${propertyId} .calendar-container`);
     if (!calendarContainer) return;
     
@@ -177,7 +302,7 @@ function renderCalendar(propertyId) {
  * Change displayed month
  */
 function changeMonth(propertyId, direction) {
-    const month = currentMonth[propertyId];
+    const month = calendarManager.currentMonth[propertyId];
     month.setMonth(month.getMonth() + direction);
     
     // Don't allow going back before current month
@@ -187,24 +312,31 @@ function changeMonth(propertyId, direction) {
         month.setFullYear(now.getFullYear());
     }
     
-    renderCalendar(propertyId);
+    calendarManager.renderCalendar(propertyId);
 }
 
 /**
+ * Legacy function - now uses CalendarManager
+ * @deprecated Use calendarManager.renderCalendar() instead
+ */
+function renderCalendar(propertyId) {
+    calendarManager.renderCalendar(propertyId);
+}
+
+/**
+ * Legacy function - now uses CalendarManager
  * Check if a date is blocked
  */
 function isDateBlocked(propertyId, dateString) {
-    return calendarData[propertyId].includes(dateString);
+    return calendarManager.isDateBlocked(propertyId, dateString);
 }
 
 /**
+ * Legacy function - now uses CalendarManager
  * Format date as YYYY-MM-DD
  */
 function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return calendarManager.formatDate(date);
 }
 
 /**
@@ -269,21 +401,10 @@ function handleDayClick(propertyId, dateString) {
 
 /**
  * Check if there are blocked dates between two dates
+ * Uses CalendarManager for availability checking
  */
 function hasBlockedDatesBetween(propertyId, startDate, endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const current = new Date(start);
-    current.setDate(current.getDate() + 1); // Start checking from day after check-in
-    
-    while (current < end) {
-        if (isDateBlocked(propertyId, formatDate(current))) {
-            return true;
-        }
-        current.setDate(current.getDate() + 1);
-    }
-    
-    return false;
+    return !calendarManager.isDateRangeAvailable(propertyId, startDate, endDate);
 }
 
 /**
@@ -426,11 +547,9 @@ function bookPropertyWithDates(propertyId, checkIn, checkOut, guests) {
     window.location.href = url;
 }
 
-/**
- * Refresh calendar data every 30 minutes
- */
-setInterval(() => {
-    Object.keys(PROPERTY_ICAL_URLS).forEach(propertyId => {
-        loadCalendarData(propertyId);
-    });
-}, 30 * 60 * 1000); // 30 minutes
+// Legacy compatibility wrapper for external scripts
+window.calendarManager = calendarManager;
+window.isDateBlocked = isDateBlocked;
+window.isDateRangeAvailable = function(propertyId, startDate, endDate) {
+    return calendarManager.isDateRangeAvailable(propertyId, startDate, endDate);
+};

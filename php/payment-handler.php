@@ -6,6 +6,7 @@
 
 require_once 'config.php';
 require_once 'MailHandler.php';
+require_once 'AvailabilityChecker.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // Composer autoload for Stripe SDK
 
 use Stripe\Stripe;
@@ -65,7 +66,8 @@ function handleStripePayment($data) {
     validateBookingData($data);
     
     // Step 2: Check availability BEFORE creating anything
-    if (!isDateRangeAvailable($data['property'], $data['checkIn'], $data['checkOut'])) {
+    $availabilityChecker = new AvailabilityChecker();
+    if (!$availabilityChecker->isDateRangeAvailable($data['property'], $data['checkIn'], $data['checkOut'])) {
         throw new Exception('Selected dates are no longer available');
     }
     
@@ -178,7 +180,8 @@ function handleBitcoinBooking($data) {
     validateBookingData($data);
     
     // Check availability
-    if (!isDateRangeAvailable($data['property'], $data['checkIn'], $data['checkOut'])) {
+    $availabilityChecker = new AvailabilityChecker();
+    if (!$availabilityChecker->isDateRangeAvailable($data['property'], $data['checkIn'], $data['checkOut'])) {
         throw new Exception('Selected dates are no longer available');
     }
     
@@ -214,7 +217,8 @@ function handleManualBooking($data) {
     validateBookingData($data);
     
     // Check availability
-    if (!isDateRangeAvailable($data['property'], $data['checkIn'], $data['checkOut'])) {
+    $availabilityChecker = new AvailabilityChecker();
+    if (!$availabilityChecker->isDateRangeAvailable($data['property'], $data['checkIn'], $data['checkOut'])) {
         throw new Exception('Selected dates are no longer available');
     }
     
@@ -305,39 +309,21 @@ function validateBookingData($data) {
 }
 
 /**
+ * Clear calendar cache for a property
+ * Wrapper function for backward compatibility - uses AvailabilityChecker
+ */
+function clearCalendarCache($propertyId) {
+    $checker = new AvailabilityChecker();
+    $checker->clearCache($propertyId);
+}
+
+/**
  * Check if date range is available
+ * Wrapper function for backward compatibility - uses AvailabilityChecker
  */
 function isDateRangeAvailable($propertyId, $checkIn, $checkOut) {
-    // Get blocked dates from calendar
-    $ch = curl_init("http://{$_SERVER['HTTP_HOST']}/php/calendar-sync.php?property=$propertyId");
-    
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    
-    $result = json_decode($response, true);
-    
-    if (!$result || !$result['success']) {
-        // If we can't check availability, allow booking but notify admin
-        logMessage("Could not verify availability for $propertyId", 'WARNING');
-        return true;
-    }
-    
-    $blockedDates = $result['blockedDates'];
-    
-    // Check each date in range
-    $current = new DateTime($checkIn);
-    $end = new DateTime($checkOut);
-    
-    while ($current < $end) {
-        $dateString = $current->format('Y-m-d');
-        if (in_array($dateString, $blockedDates)) {
-            return false;
-        }
-        $current->modify('+1 day');
-    }
-    
-    return true;
+    $checker = new AvailabilityChecker();
+    return $checker->isDateRangeAvailable($propertyId, $checkIn, $checkOut);
 }
 
 /**
@@ -401,6 +387,10 @@ function createBookingWithId($bookingId, $data, $status, $paymentIntentId = null
     
     file_put_contents($bookingFile, json_encode($bookingData, JSON_PRETTY_PRINT));
     
+    // Clear calendar cache for this property to reflect new booking immediately
+    $availabilityChecker = new AvailabilityChecker();
+    $availabilityChecker->clearCache($data['property']);
+    
     // Send notification to admin
     sendAdminNotification($bookingData);
     
@@ -411,6 +401,22 @@ function createBookingWithId($bookingId, $data, $status, $paymentIntentId = null
  * Update booking record
  */
 function updateBooking($bookingId, $updates) {
+    // Get the property ID before updating (needed for cache clearing)
+    $propertyId = null;
+    try {
+        $pdo = getDBConnection();
+        if ($pdo) {
+            $stmt = $pdo->prepare("SELECT property FROM bookings WHERE booking_id = :booking_id");
+            $stmt->execute(['booking_id' => $bookingId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($result) {
+                $propertyId = $result['property'];
+            }
+        }
+    } catch (Exception $e) {
+        logMessage("Failed to get property for cache clearing: " . $e->getMessage(), 'WARNING');
+    }
+    
     // Update database
     try {
         $pdo = getDBConnection();
@@ -435,6 +441,20 @@ function updateBooking($bookingId, $updates) {
         $bookingData = json_decode(file_get_contents($bookingFile), true);
         $bookingData = array_merge($bookingData, $updates);
         file_put_contents($bookingFile, json_encode($bookingData, JSON_PRETTY_PRINT));
+        
+        // Get property from file if we didn't get it from DB
+        if (!$propertyId && isset($bookingData['property'])) {
+            $propertyId = $bookingData['property'];
+        }
+    }
+    
+    // Clear calendar cache if status changed to a blocking status
+    if ($propertyId && isset($updates['status'])) {
+        $blockingStatuses = ['pending', 'pending_bitcoin', 'confirmed', 'paid'];
+        if (in_array($updates['status'], $blockingStatuses)) {
+            $availabilityChecker = new AvailabilityChecker();
+            $availabilityChecker->clearCache($propertyId);
+        }
     }
 }
 
