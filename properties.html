@@ -17,6 +17,23 @@
             font-size: 20px;
             font-weight: 700;
         }
+        
+        /* Error message styling - boxy and centered */
+        .filter-error {
+            margin-top: 15px;
+            padding: 15px 20px;
+            border: 2px solid #d32f2f;
+            border-radius: 6px;
+            background-color: #ffebee;
+            text-align: center;
+            display: none;
+        }
+        
+        .filter-error p {
+            margin: 0;
+            color: #d32f2f;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -70,7 +87,7 @@
                     </select>
                 </div>
                 <button class="btn btn-primary" id="searchBtn">Check Availability</button>
-                <div class="filter-error" id="filterError"></div>
+                
             </div>
         </div>
     </section>
@@ -78,6 +95,7 @@
     <!-- Properties Listing -->
     <section class="properties-listing">
         <div class="container">
+            <div class="filter-error" id="filterError"></div>
             <div class="no-properties-message" id="noPropertiesMessage">
                 <p>Please select check-in and check-out dates above to see available properties.</p>
             </div>

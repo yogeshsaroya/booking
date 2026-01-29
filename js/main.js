@@ -381,6 +381,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Disable previous dates in checkout when check-in date is selected
+    if (checkInInput) {
+        checkInInput.addEventListener('change', function() {
+            if (this.value) {
+                checkOutInput.min = this.value;
+                // Clear checkout if it's before check-in
+                if (checkOutInput.value && checkOutInput.value < this.value) {
+                    checkOutInput.value = '';
+                }
+            } else {
+                checkOutInput.min = '';
+            }
+        });
+    }
+    
     // Hide all properties by default on page load - show only when searched
     const propertyIds = ['stone', 'copper', 'cedar'];
     propertyIds.forEach(id => {
