@@ -221,36 +221,141 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+    .confirmation-container {
+        max-width: 700px;
+    }
+}
+
 @media (max-width: 768px) {
+    .confirmation-section {
+        padding: var(--spacing-md) 0;
+        margin-top: 70px;
+    }
+    
+    .confirmation-container {
+        padding: 0 var(--spacing-md);
+    }
+    
     .confirmation-card {
         padding: var(--spacing-md);
     }
 
     .confirmation-card h1 {
-        font-size: 2rem;
+        font-size: 1.875rem;
+    }
+    
+    .confirmation-subtitle {
+        font-size: 1rem;
     }
 
     .success-icon {
         width: 60px;
         height: 60px;
         font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .confirmation-message {
+        padding: 1rem;
+    }
+    
+    .confirmation-details h2 {
+        font-size: 1.375rem;
+    }
+    
+    .details-section {
+        padding: 1rem;
     }
 
     .details-row {
         flex-direction: column;
         align-items: flex-start;
+        gap: 0.25rem;
     }
 
     .details-value {
         text-align: left;
-        margin-top: 0.5rem;
+        margin-top: 0.25rem;
+        font-size: 1rem;
+    }
+    
+    .details-label {
+        font-size: 0.9rem;
+    }
+    
+    .details-section.pricing .details-row {
+        font-size: 1rem;
+    }
+    
+    .details-row.total {
+        font-size: 1.25rem;
+    }
+    
+    .payment-info {
+        padding: 1rem;
+    }
+    
+    .next-steps {
+        padding: 1rem;
     }
 
     .confirmation-actions {
         flex-direction: column;
+        gap: var(--spacing-sm);
     }
 
     .confirmation-actions .btn {
         width: 100%;
+        min-width: auto;
+    }
+    
+    .support-card {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .confirmation-section {
+        padding: 1rem 0;
+    }
+    
+    .confirmation-container {
+        padding: 0 1rem;
+    }
+    
+    .confirmation-card {
+        padding: 1rem;
+    }
+    
+    .confirmation-card h1 {
+        font-size: 1.625rem;
+    }
+    
+    .confirmation-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .success-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.75rem;
+    }
+    
+    .confirmation-message {
+        padding: 0.875rem;
+    }
+    
+    .confirmation-details h2 {
+        font-size: 1.25rem;
+    }
+    
+    .details-row.total {
+        font-size: 1.125rem;
+    }
+    
+    .btn {
+        padding: 1rem;
+        font-size: 1rem;
     }
 }
