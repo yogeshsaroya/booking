@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStayz - Book Tampa's Coolest Spaces for Less</title>
+    <meta name="description"
+        content="Discover unique boutique vacation rentals in Tampa's Hyde Park. Handcrafted spaces with style, premium amenities, and unbeatable location.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Karla:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Additional styles specific to the home page */
+        .hero-home {
+            margin-top: 80px;
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: var(--spacing-xl) var(--spacing-md);
+            background: linear-gradient(135deg, rgba(139, 111, 71, 0.1) 0%, rgba(245, 243, 239, 0.4) 50%, rgba(138, 154, 123, 0.1) 100%),
+                url('https://a0.muscache.com/im/pictures/hosting/Hosting-42680597/original/7fc423ca-2c8f-4905-8e27-64f02b3b43e9.jpeg?im_w=1920') center/cover no-repeat;
+            position: relative;
+        }
+
+        .hero-home::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 252, 247, 0.5);
+            z-index: 0;
+        }
+
+        .hero-home-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-home h1 {
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 300;
+            margin-bottom: var(--spacing-md);
+            color: var(--charcoal);
+        }
+
+        .hero-home h1 .highlight-home {
+            display: block;
+            font-weight: 600;
+            color: var(--warm-cedar);
+            margin-top: 0.5rem;
+        }
+
+        .hero-home-subtitle {
+            font-size: 1.2rem;
+            color: var(--stone-gray);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.8;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 50px rgba(61, 53, 48, 0.15);
+            padding: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto var(--spacing-lg);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--stone-gray);
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+
+        .search-group input,
+        .search-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(107, 100, 89, 0.2);
+            border-radius: 4px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            background: var(--warm-white);
+            transition: var(--transition-quick);
+            height: 46px;
+        }
+
+        .search-group input:focus,
+        .search-group select:focus {
+            outline: none;
+            border-color: var(--warm-cedar);
+            box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1);
+        }
+
+        .search-btn {
+            padding: 0.75rem 2rem;
+            background: var(--warm-cedar);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            height: 46px;
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            background: var(--copper-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 111, 71, 0.3);
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: var(--spacing-md);
+        }
+
+        .featured-properties {
+            padding: var(--spacing-xl) 0;
+            background: var(--warm-white);
+        }
+
+        .property-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .showcase-card {
+            position: relative;
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 5px 20px rgba(61, 53, 48, 0.1);
+        }
+
+        .showcase-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 40%, rgba(43, 39, 36, 0.85) 100%);
+            z-index: 1;
+        }
+
+        .showcase-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(61, 53, 48, 0.2);
+        }
+
+        .showcase-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition-smooth);
+        }
+
+        .showcase-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .showcase-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: var(--spacing-md);
+            z-index: 2;
+            color: white;
+        }
+
+        .showcase-title {
+            font-size: 2rem;
+            font-family: var(--font-display);
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .showcase-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .why-choose {
+            padding: var(--spacing-xl) 0;
+            background: var(--soft-cream);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: var(--spacing-md);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--charcoal);
+        }
+
+        .feature-card p {
+            color: var(--stone-gray);
+            line-height: 1.7;
+        }
+
+        .testimonials {
+            padding: var(--spacing-xl) 0;
+            background: var(--warm-white);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .testimonial-card {
+            background: var(--soft-cream);
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            border-left: 4px solid var(--warm-cedar);
+        }
+
+        .testimonial-rating {
+            color: var(--warm-cedar);
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            color: var(--deep-earth);
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.7;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--charcoal);
+            font-size: 0.9rem;
+        }
+
+        .cta-banner {
+            padding: calc(var(--spacing-xl) * 1.5) var(--spacing-md);
+            background: linear-gradient(135deg, var(--warm-cedar) 0%, var(--copper-accent) 100%);
+            text-align: center;
+            color: white;
+        }
+
+        .cta-banner h2 {
+            color: white;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .cta-banner p {
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.95;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--warm-cedar);
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-white:hover {
+            background: var(--soft-cream);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline-white {
+            background: transparent;
+            color: white;
+            padding: 1rem 2rem;
+            border: 2px solid white;
+            border-radius: 4px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-outline-white:hover {
+            background: white;
+            color: var(--warm-cedar);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 968px) {
+            .search-box {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+
+            .search-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-home {
+                min-height: 70vh;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="home.html" class="logo">SmartStayz</a>
+            <ul class="nav-menu">
+                <li><a href="properties.html">Properties</a></li>
+                <li><a href="#why-choose">Why Choose Us</a></li>
+                <li><a href="#location">Location</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Search -->
+    <section class="hero-home">
+        <div class="hero-home-content">
+            <h1>
+                Discover Tampa's
+                <span class="highlight-home">Coolest Spaces for Less</span>
+            </h1>
+            <p class="hero-home-subtitle">
+                Unique boutique rentals in Hyde Park's most desirable neighborhood.<br>
+                Handcrafted design. Premium amenities. Unforgettable stays.
+            </p>
+
+            <!-- Search Box -->
+            <div class="search-box">
+                <div class="search-group">
+                    <label for="property-type">Type of Stay</label>
+                    <select id="property-type">
+                        <option value="">Select property...</option>
+                        <option value="stone">The Stone - Urban Industrial</option>
+                        <option value="copper">The Copper - Vibrant Maximalist</option>
+                        <option value="cedar">The Cedar - Rustic Chic</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <label for="check-in">Check-in</label>
+                    <input type="date" id="check-in">
+                </div>
+                <div class="search-group">
+                    <label for="check-out">Check-out</label>
+                    <input type="date" id="check-out">
+                </div>
+                <button class="search-btn" onclick="searchAvailability()">Search</button>
+            </div>
+
+            <div class="hero-cta">
+                <a href="properties.html" class="btn btn-primary">Browse All Properties</a>
+                <a href="#why-choose" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Properties Showcase -->
+    <section class="featured-properties">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Collection</h2>
+                <p class="section-subtitle">
+                    Three distinctive spaces, each with its own character and charm
+                </p>
+            </div>
+
+            <div class="property-showcase">
+                <a href="property-stone.html" class="showcase-card">
+                    <img src="https://a0.muscache.com/im/pictures/miso/Hosting-42680597/original/6524c711-272c-43b6-b221-62fc77515e90.jpeg?im_w=720"
+                        alt="The Stone - Urban-Industrial">
+                    <div class="showcase-info">
+                        <h3 class="showcase-title">Urban-Industrial</h3>
+                        <p class="showcase-subtitle">The Stone</p>
+                    </div>
+                </a>
+
+                <a href="property-copper.html" class="showcase-card">
+                    <img src="https://a0.muscache.com/im/pictures/016adea6-85d0-4ae9-99ea-6e15d9390605.jpg?im_w=720"
+                        alt="The Copper - Vibrant Maximalist">
+                    <div class="showcase-info">
+                        <h3 class="showcase-title">Vibrant Maximalist</h3>
+                        <p class="showcase-subtitle">The Copper</p>
+                    </div>
+                </a>
+
+                <a href="property-cedar.html" class="showcase-card">
+                    <img src="https://a0.muscache.com/im/pictures/miso/Hosting-40961787/original/f7b22195-73c0-4b4e-b40e-4b4c4432f8ec.jpeg?im_w=720"
+                        alt="The Cedar - Rustic-Chic">
+                    <div class="showcase-info">
+                        <h3 class="showcase-title">Rustic-Chic</h3>
+                        <p class="showcase-subtitle">The Cedar</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="why-choose" id="why-choose">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why SmartStayz?</h2>
+                <p class="section-subtitle">
+                    Experience the difference of truly handcrafted hospitality
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🏛️</div>
+                    <h3>Handcrafted Design</h3>
+                    <p>Each property is personally designed and built by your host. No generic corporate rentals—just authentic, artisanal spaces with soul.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Prime Location</h3>
+                    <p>Located in Hyde Park, Tampa's most walkable neighborhood. Three blocks to SoHo dining, Hyde Park Village shopping, and Bayshore Boulevard.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔑</div>
+                    <h3>Seamless Check-in</h3>
+                    <p>Keypad entry and private parking mean you can arrive on your schedule. No waiting, no key exchanges—just arrive and relax.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🐕</div>
+                    <h3>Pet-Friendly</h3>
+                    <p>Your furry family members are welcome! Private fenced yards provide a safe space for your pets to play and explore.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">☕</div>
+                    <h3>Premium Amenities</h3>
+                    <p>Full coffee bars with espresso machines, 55" smart TVs, rainfall showers, high-speed WiFi, and luxury linens in every property.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3>Superhost Quality</h3>
+                    <p>Consistently 5-star rated across 1,800+ reviews. Our commitment to excellence ensures your stay exceeds expectations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Guest Experiences</h2>
+                <p class="section-subtitle">
+                    Don't just take our word for it—hear from our guests
+                </p>
+            </div>
+
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-text">
+                        "The Stone was absolutely incredible! Every detail was thoughtfully designed. The location couldn't be better—we walked to amazing restaurants every night. Best Airbnb we've ever stayed at."
+                    </p>
+                    <p class="testimonial-author">— Sarah M., October 2025</p>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-text">
+                        "The Copper exceeded all expectations. The design is stunning, the space is immaculate, and Joseph was incredibly responsive. Perfect for our family vacation with our dog!"
+                    </p>
+                    <p class="testimonial-author">— Michael R., December 2025</p>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-text">
+                        "The Cedar is a hidden gem! Beautifully decorated with high-end finishes. The fenced yard was perfect for our pup. Can't wait to return to Tampa and stay here again."
+                    </p>
+                    <p class="testimonial-author">— Jennifer L., January 2026</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section class="location-section" id="location">
+        <div class="container">
+            <div class="location-content">
+                <div class="location-text">
+                    <h2 class="section-title">Hyde Park & SoHo</h2>
+                    <p class="location-description">
+                        Tampa's most walkable, vibrant neighborhood. Our properties sit just three blocks from South
+                        Howard Street (SoHo) and Hyde Park Village—home to acclaimed restaurants, boutique shopping, and
+                        historic charm.
+                    </p>
+                    <ul class="location-highlights">
+                        <li>3 blocks to SoHo restaurants & nightlife</li>
+                        <li>Walk to Hyde Park Village boutiques</li>
+                        <li>Minutes to downtown Tampa & Amalie Arena</li>
+                        <li>30 minutes to Clearwater & St. Pete beaches</li>
+                        <li>Bayshore Boulevard waterfront path nearby</li>
+                        <li>Easy access to Tampa International Airport</li>
+                    </ul>
+                </div>
+                <div class="location-map">
+                    <div class="map-placeholder">
+                        <iframe width="100%" height="450" style="border:0;" loading="lazy" allowfullscreen
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps?q=27.9403,-82.4659&hl=en&z=15&output=embed">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="cta-banner">
+        <div class="container">
+            <h2>Ready to Experience SmartStayz?</h2>
+            <p>Book your perfect Tampa vacation rental today and discover what makes us different.</p>
+            <div class="cta-buttons">
+                <a href="properties.html" class="btn-white">Check Availability</a>
+                <a href="#contact" class="btn-outline-white">Ask a Question</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <h2 class="section-title">Get in Touch</h2>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Have Questions?</h3>
+                    <p>We're here to help make your stay perfect. Reach out anytime!</p>
+                    <div class="contact-details">
+                        <p><strong>Response Rate:</strong> 100%</p>
+                        <p><strong>Response Time:</strong> Within 1 hour</p>
+                        <p><strong>Host:</strong> Joseph - Superhost since 2018</p>
+                        <p><strong>Total Reviews:</strong> 1,800+ five-star reviews</p>
+                    </div>
+                </div>
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <input type="text" name="name" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Your Email" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+                    </div>
+                    <div id="contactFormMessage"></div>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>SmartStayz</h4>
+                    <p>Boutique short-term rentals in Hyde Park, Tampa's premier neighborhood. Handcrafted spaces for unforgettable stays.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Properties</h4>
+                    <ul>
+                        <li><a href="property-stone.html">The Stone - Urban Industrial</a></li>
+                        <li><a href="property-copper.html">The Copper - Vibrant Maximalist</a></li>
+                        <li><a href="property-cedar.html">The Cedar - Rustic Chic</a></li>
+                        <li><a href="properties.html">View All</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>SmartStayz for Guests</h4>
+                    <ul>
+                        <li><a href="properties.html">How It Works</a></li>
+                        <li><a href="#why-choose">Why Choose Us</a></li>
+                        <li><a href="#contact">FAQs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="https://www.airbnb.com/users/show/db956adc-5e6e-44c1-9e55-2ead83e4a3be"
+                                target="_blank">Airbnb Profile</a></li>
+                        <li><a href="#" target="_blank">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SmartStayz, LLC. All rights reserved. | <a href="#" style="color: var(--stone-gray);">Terms & Conditions</a> | <a href="#" style="color: var(--stone-gray);">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Search functionality
+        function searchAvailability() {
+            const propertyType = document.getElementById('property-type').value;
+            const checkIn = document.getElementById('check-in').value;
+            const checkOut = document.getElementById('check-out').value;
+
+            if (!propertyType) {
+                alert('Please select a property type');
+                return;
+            }
+
+            if (!checkIn || !checkOut) {
+                alert('Please select check-in and check-out dates');
+                return;
+            }
+
+            // Redirect to property page or booking page with dates
+            const propertyPages = {
+                'stone': 'property-stone.html',
+                'copper': 'property-copper.html',
+                'cedar': 'property-cedar.html'
+            };
+
+            const url = `${propertyPages[propertyType]}?checkin=${checkIn}&checkout=${checkOut}`;
+            window.location.href = url;
+        }
+
+        // Set minimum date for check-in to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('check-in').setAttribute('min', today);
+        
+        // Update check-out minimum date when check-in changes
+        document.getElementById('check-in').addEventListener('change', function() {
+            const checkInDate = new Date(this.value);
+            const nextDay = new Date(checkInDate);
+            nextDay.setDate(checkInDate.getDate() + 1);
+            const minCheckOut = nextDay.toISOString().split('T')[0];
+            document.getElementById('check-out').setAttribute('min', minCheckOut);
+        });
+    </script>
+</body>
+
+</html>
