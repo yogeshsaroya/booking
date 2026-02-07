@@ -3,6 +3,16 @@
  * Handles navigation, forms, and general UI interactions
  */
 
+// Transparent Header with Scroll Effect
+const nav = document.querySelector('.nav');
+window.addEventListener('scroll', function() {
+    if (window.scrollY > 50) {
+        nav.classList.add('scrolled');
+    } else {
+        nav.classList.remove('scrolled');
+    }
+});
+
 // Mobile Navigation Toggle
 document.addEventListener('DOMContentLoaded', function() {
     const navToggle = document.querySelector('.nav-toggle');

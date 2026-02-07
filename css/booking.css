@@ -98,8 +98,8 @@
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--copper-accent);
-    box-shadow: 0 0 0 3px rgba(166, 115, 82, 0.1);
+    border-color: #D4A574;
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
 }
 
 .checkbox-group label {
@@ -118,7 +118,7 @@
 }
 
 .checkbox-group a {
-    color: var(--copper-accent);
+    color: #D4A574;
     text-decoration: underline;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .payment-option:hover {
-    border-color: var(--copper-accent);
+    border-color: #D4A574;
     background: var(--soft-cream);
 }
 
@@ -151,12 +151,12 @@
 }
 
 .payment-option input[type="radio"]:checked + .payment-label {
-    color: var(--copper-accent);
+    color: #D4A574;
 }
 
 .payment-option:has(input:checked) {
-    border-color: var(--copper-accent);
-    background: rgba(166, 115, 82, 0.05);
+    border-color: #D4A574;
+    background: rgba(212, 165, 116, 0.08);
 }
 
 .payment-label {
@@ -189,8 +189,8 @@
 }
 
 .stripe-element.StripeElement--focus {
-    border-color: var(--copper-accent);
-    box-shadow: 0 0 0 3px rgba(166, 115, 82, 0.1);
+    border-color: #D4A574;
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
 }
 
 .error-message {
@@ -232,13 +232,13 @@
 }
 
 .highlight-text {
-    color: var(--copper-accent);
+    color: #D4A574;
     font-weight: 500;
 }
 
 .small-text {
     font-size: 0.85rem;
-    color: var(--stone-gray);
+    color: #666666;
 }
 
 /* Booking Sidebar */
@@ -274,7 +274,7 @@
 }
 
 .summary-section:last-of-type {
-    border-bottom: 2px solid var(--copper-accent);
+    border-bottom: 2px solid #D4A574;
 }
 
 .summary-row {

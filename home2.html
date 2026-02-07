@@ -11,13 +11,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Karla:wght@300;400;500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <style>
         /* Additional styles specific to the home page */
         .hero-home {
-            margin-top: 80px;
-            min-height: 85vh;
+            margin-top: 0;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -42,7 +42,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(139, 111, 71, 0.1) 0%, rgba(245, 243, 239, 0.4) 50%, rgba(138, 154, 123, 0.1) 100%);
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.5) 100%);
             z-index: -1;
         }
 
@@ -50,7 +50,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(255, 252, 247, 0.5);
+            background: transparent;
             z-index: 0;
         }
 
@@ -65,33 +65,35 @@
             font-size: clamp(2.5rem, 7vw, 5rem);
             font-weight: 300;
             margin-bottom: var(--spacing-md);
-            color: var(--charcoal);
+            color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .hero-home h1 .highlight-home {
             display: block;
             font-weight: 600;
-            color: var(--warm-cedar);
+            color: #FFD700;
             margin-top: 0.5rem;
         }
 
         .hero-home-subtitle {
             font-size: 1.2rem;
-            color: var(--stone-gray);
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: var(--spacing-lg);
             line-height: 1.8;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         }
 
         .search-box {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 50px rgba(61, 53, 48, 0.15);
-            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
             max-width: 800px;
             margin: 0 auto var(--spacing-lg);
             display: grid;
             grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 1rem;
+            gap: 1.5rem;
             align-items: end;
         }
 
@@ -103,52 +105,56 @@
         .search-group label {
             display: block;
             font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--stone-gray);
-            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--deep-earth);
+            margin-bottom: 0.75rem;
             text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .search-group input,
         .search-group select {
             width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid rgba(107, 100, 89, 0.2);
-            border-radius: 4px;
+            padding: 0.9rem 1rem;
+            border: 1px solid rgba(107, 100, 89, 0.15);
+            border-radius: 6px;
             font-family: var(--font-body);
             font-size: 0.95rem;
-            background: var(--warm-white);
+            background: var(--soft-cream);
             transition: var(--transition-quick);
-            height: 46px;
+            height: 48px;
         }
 
         .search-group input:focus,
         .search-group select:focus {
             outline: none;
-            border-color: var(--warm-cedar);
-            box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1);
+            border-color: var(--primary-gold);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
         }
 
         .search-btn {
-            padding: 0.75rem 2rem;
-            background: var(--warm-cedar);
+            padding: 0.9rem 2.5rem;
+            background: var(--primary-gold);
             color: white;
             border: none;
-            border-radius: 4px;
-            font-weight: 500;
+            border-radius: 6px;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition-smooth);
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-size: 0.9rem;
-            height: 46px;
+            font-size: 0.85rem;
+            height: 48px;
             white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
         }
 
         .search-btn:hover {
-            background: var(--copper-accent);
+            background: var(--gold-hover);
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(139, 111, 71, 0.3);
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.4);
         }
 
         .hero-cta {
@@ -375,21 +381,22 @@
 
         @media (max-width: 968px) {
             .search-box {
-                grid-template-columns: 1fr;
-                max-width: 500px;
-                padding: 1.25rem;
+                grid-template-columns: 1fr 1fr;
+                max-width: 100%;
+                padding: 1.5rem;
             }
 
             .search-btn {
+                grid-column: 1 / -1;
                 width: 100%;
             }
         }
 
         @media (max-width: 768px) {
             .hero-home {
-                min-height: 60vh;
-                margin-top: 70px;
-                padding: var(--spacing-md);
+                min-height: 85vh;
+                margin-top: 0;
+                padding: var(--spacing-lg) var(--spacing-md);
             }
             
             .hero-video-bg {
@@ -397,32 +404,36 @@
             }
             
             .hero-home h1 {
-                font-size: 2.25rem;
+                font-size: 2rem;
+                margin-bottom: 1rem;
             }
             
             .hero-home-subtitle {
-                font-size: 1rem;
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
             }
             
             .search-box {
-                padding: 1rem;
-                gap: 0.75rem;
+                padding: 1.5rem;
+                gap: 1rem;
+                grid-template-columns: 1fr;
             }
             
             .search-group label {
-                font-size: 0.8rem;
+                font-size: 0.75rem;
+                font-weight: 600;
             }
             
             .search-group input,
             .search-group select {
-                padding: 0.875rem;
-                font-size: 1rem;
+                padding: 0.85rem 1rem;
+                font-size: 0.95rem;
                 height: 44px;
             }
             
             .search-btn {
-                padding: 1rem;
-                font-size: 0.95rem;
+                padding: 0.85rem 2rem;
+                font-size: 0.8rem;
                 height: 44px;
             }
             
@@ -538,10 +549,12 @@
     <!-- Navigation -->
     <nav class="nav">
         <div class="nav-container">
-            <a href="home2.html" class="logo">SmartStayz</a>
+            <a href="home2.html" class="logo">
+                <img src="https://smartstayz.com/cdn/images/SmartStayz-Logo.png" alt="SmartStayz">
+            </a>
             <ul class="nav-menu">
                 <li><a href="properties.html">Properties</a></li>
-                <li><a href="#why-choose">Why Choose Us</a></li>
+                <li><a href="#amenities">Amenities</a></li>
                 <li><a href="#location">Location</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
@@ -810,38 +823,50 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>SmartStayz</h4>
-                    <p>Boutique short-term rentals in Hyde Park, Tampa's premier neighborhood. Handcrafted spaces for unforgettable stays.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Properties</h4>
+                    <h4>About</h4>
                     <ul>
-                        <li><a href="property-stone.html">The Stone - Urban Industrial</a></li>
-                        <li><a href="property-copper.html">The Copper - Vibrant Maximalist</a></li>
-                        <li><a href="property-cedar.html">The Cedar - Rustic Chic</a></li>
-                        <li><a href="properties.html">View All</a></li>
+                        <li><a href="#welcome">Welcome</a></li>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>SmartStayz for Guests</h4>
+                    <h4>SmartStayz for Housemates</h4>
                     <ul>
-                        <li><a href="properties.html">How It Works</a></li>
-                        <li><a href="#why-choose">Why Choose Us</a></li>
-                        <li><a href="#contact">FAQs</a></li>
+                        <li><a href="#how-it-works">How it works</a></li>
+                        <li><a href="#faqs">FAQs</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Connect</h4>
+                    <h4>SmartStayz for Hosts</h4>
                     <ul>
-                        <li><a href="#contact">Contact Us</a></li>
-                        <li><a href="https://www.airbnb.com/users/show/db956adc-5e6e-44c1-9e55-2ead83e4a3be"
-                                target="_blank">Airbnb Profile</a></li>
-                        <li><a href="#" target="_blank">Instagram</a></li>
+                        <li><a href="#how-it-works">How it works</a></li>
+                        <li><a href="#faqs">FAQs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Join the Team</h4>
+                    <ul>
+                        <li><a href="#internship">Internship</a></li>
+                        <li><a href="#affiliate">Affiliate Program</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 SmartStayz, LLC. All rights reserved. | <a href="#" style="color: var(--stone-gray);">Terms & Conditions</a> | <a href="#" style="color: var(--stone-gray);">Privacy Policy</a></p>
+                <div class="footer-brand">
+                    <h4>SmartStayz</h4>
+                    <p>SmartStayz, LLC<br><a href="#" style="color: var(--stone-gray);">Copyright 2026</a></p>
+                </div>
+                <div class="footer-links">
+                    <a href="#terms" style="color: var(--stone-gray);">Terms & Conditions</a>
+                </div>
+                <div class="footer-social">
+                    <p>Follow us:</p>
+                    <ul>
+                        <li><a href="#facebook" target="_blank">f</a></li>
+                        <li><a href="https://twitter.com/Smartstayz" target="_blank">𝕏</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </footer>
