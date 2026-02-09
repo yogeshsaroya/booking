@@ -12,6 +12,25 @@ const SERVICE_FEE = 25;
  * Initialize property detail page
  */
 document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCheckIn = urlParams.get('checkIn') || urlParams.get('checkin');
+    const urlCheckOut = urlParams.get('checkOut') || urlParams.get('checkout');
+
+    if ((urlCheckIn && !urlCheckOut) || (!urlCheckIn && urlCheckOut)) {
+        window.location.replace('home2.html');
+        return;
+    }
+
+    if (urlCheckIn && urlCheckOut) {
+        const checkInDate = new Date(urlCheckIn);
+        const checkOutDate = new Date(urlCheckOut);
+
+        if (Number.isNaN(checkInDate.getTime()) || Number.isNaN(checkOutDate.getTime()) || checkOutDate <= checkInDate) {
+            window.location.replace('home2.html');
+            return;
+        }
+    }
+
     // Set minimum date to today
     const today = new Date().toISOString().split('T')[0];
     const checkInInput = document.getElementById('checkInDate');
@@ -66,7 +85,11 @@ function handleCheckInChange(event) {
 function calculatePrice() {
     const checkInInput = document.getElementById('checkInDate');
     const checkOutInput = document.getElementById('checkOutDate');
-    
+
+    if (!checkInInput || !checkOutInput) {
+        return;
+    }
+
     if (!checkInInput.value || !checkOutInput.value) {
         updatePricing(0, 0);
         return;
@@ -225,8 +248,8 @@ document.querySelectorAll('.hero-grid-image').forEach((img, index) => {
  */
 window.addEventListener('load', function() {
     const urlParams = new URLSearchParams(window.location.search);
-    const checkIn = urlParams.get('checkIn');
-    const checkOut = urlParams.get('checkOut');
+    const checkIn = urlParams.get('checkIn') || urlParams.get('checkin');
+    const checkOut = urlParams.get('checkOut') || urlParams.get('checkout');
     const guests = urlParams.get('guests');
     
     if (checkIn && checkOut) {
@@ -243,4 +266,86 @@ window.addEventListener('load', function() {
         const guestsSelect = document.getElementById('guestsSelect');
         if (guestsSelect) guestsSelect.value = guests;
     }
+
+    if (checkIn && checkOut) {
+        const propertyId = getPropertyIdFromPage();
+        if (propertyId) {
+            applySearchDatesToCalendar(propertyId, checkIn, checkOut);
+        }
+    }
 });
+
+function getPropertyIdFromPage() {
+    const calendarEl = document.querySelector('.availability-calendar[id^="calendar-"]');
+    if (!calendarEl) {
+        return null;
+    }
+    return calendarEl.id.replace('calendar-', '');
+}
+
+function waitForCalendarRender(propertyId, callback) {
+    const calendarContainer = document.querySelector(`#calendar-${propertyId} .calendar-container`);
+    if (!calendarContainer) {
+        return;
+    }
+
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+        const isLoaded = window.calendarManager && window.calendarManager.loaded && window.calendarManager.loaded[propertyId];
+        const hasDays = calendarContainer.querySelector('.calendar-day');
+        if (isLoaded && hasDays) {
+            clearInterval(timer);
+            callback();
+            return;
+        }
+
+        if (Date.now() - startTime > 8000) {
+            clearInterval(timer);
+            callback();
+        }
+    }, 150);
+}
+
+function applySearchDatesToCalendar(propertyId, checkIn, checkOut) {
+    const calendarSection = document.querySelector('.calendar-section');
+    if (calendarSection) {
+        calendarSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    waitForCalendarRender(propertyId, () => {
+        const sidebarError = document.getElementById(`errorMessage-${propertyId}-sidebar`);
+        const sidebarBookBtn = document.getElementById(`bookBtn-${propertyId}-sidebar`);
+        const defaultErrorText = 'Please select dates from the calendar above.';
+
+        if (!window.calendarManager || typeof window.calendarManager.isDateRangeAvailable !== 'function') {
+            return;
+        }
+
+        const isAvailable = window.calendarManager.isDateRangeAvailable(propertyId, checkIn, checkOut);
+
+        if (isAvailable) {
+            selectedDates[propertyId] = { checkIn, checkOut };
+            if (window.calendarManager.currentMonth) {
+                window.calendarManager.currentMonth[propertyId] = new Date(checkIn);
+                window.calendarManager.renderCalendar(propertyId);
+            }
+            updateCalendarSelection(propertyId);
+            if (sidebarError) {
+                sidebarError.style.display = 'none';
+                const errorText = sidebarError.querySelector('p');
+                if (errorText) errorText.textContent = defaultErrorText;
+            }
+        } else {
+            selectedDates[propertyId] = { checkIn: null, checkOut: null };
+            updateCalendarSelection(propertyId);
+            if (sidebarBookBtn) sidebarBookBtn.disabled = true;
+            if (sidebarError) {
+                sidebarError.style.display = 'block';
+                const errorText = sidebarError.querySelector('p');
+                if (errorText) {
+                    errorText.textContent = 'Selected dates are not available. Please choose other dates or another property.';
+                }
+            }
+        }
+    });
+}

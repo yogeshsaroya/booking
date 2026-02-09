@@ -22,6 +22,13 @@ class CalendarManager {
             copper: [],
             cedar: []
         };
+
+        // Track calendar data load status
+        this.loaded = {
+            stone: false,
+            copper: false,
+            cedar: false
+        };
         
         // Current month display
         this.currentMonth = {
@@ -55,14 +62,17 @@ class CalendarManager {
             
             if (data.success) {
                 this.blockedDates[propertyId] = data.blockedDates || [];
+                this.loaded[propertyId] = true;
                 console.log(`Loaded ${this.blockedDates[propertyId].length} blocked dates for ${propertyId}`);
                 return true;
             } else {
+                this.loaded[propertyId] = false;
                 this.showError(calendarContainer, 'Unable to load calendar. Please try again later.');
                 return false;
             }
         } catch (error) {
             console.error('Error loading calendar:', error);
+            this.loaded[propertyId] = false;
             this.showError(calendarContainer, 'Unable to load calendar. Please try again later.');
             return false;
         }
@@ -76,15 +86,16 @@ class CalendarManager {
     }
     
     /**
-     * Check if date range is available (no blocked dates in between)
+     * Check if date range is available (no blocked dates between check-in and check-out)
+     * Checkout day is treated as exclusive.
      */
     isDateRangeAvailable(propertyId, startDate, endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
         const current = new Date(start);
         
-        // Check each date in the range (INCLUDING checkout day)
-        while (current <= end) {
+        // Check each date in the range (EXCLUDING checkout day)
+        while (current < end) {
             const dateString = this.formatDate(current);
             if (this.isDateBlocked(propertyId, dateString)) {
                 return false;
