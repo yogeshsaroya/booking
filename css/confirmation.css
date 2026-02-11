@@ -194,6 +194,11 @@
 .confirmation-actions .btn {
     flex: 1;
     min-width: 200px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
 }
 
 /* Support Card */
