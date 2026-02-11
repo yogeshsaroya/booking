@@ -66,9 +66,16 @@
         .hero-home h1 {
             font-size: clamp(2.5rem, 7vw, 5rem);
             font-weight: 300;
-            margin-bottom: var(--spacing-md);
+            margin-bottom: 0.75rem;
             color: white;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-home-title-img {
+            width: clamp(180px, 32vw, 380px);
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
 
         .hero-home h1 .highlight-home {
@@ -79,11 +86,12 @@
         }
 
         .hero-home-subtitle {
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2.2vw, 1.6rem);
             color: rgba(255, 255, 255, 0.9);
             margin-bottom: var(--spacing-lg);
             line-height: 1.8;
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 400;
         }
 
         .search-box {
@@ -643,26 +651,15 @@
 
         <div class="hero-home-content">
             <h1>
-                Discover Tampa's
-                <span class="highlight-home">Coolest Spaces for Less</span>
+                <img class="hero-home-title-img" src="https://smartstayz.com/files/Stay-Smart-Img.png" alt="Stay Smart">
             </h1>
             <p class="hero-home-subtitle">
-                Unique boutique rentals in Hyde Park's most desirable neighborhood.<br>
-                Handcrafted design. Premium amenities. Unforgettable stays.
+                Handcrafted design. Unforgettable stays. Amazing Value.
             </p>
 
             <!-- Search Box -->
             <div class="search-box">
                 <ul class="search-list">
-                    <li class="search-item">
-                        <span class="search-label">City or Neighborhood</span>
-                        <select id="search-location">
-                            <option value="">Select property...</option>
-                            <option value="stone">The Stone - Urban Industrial</option>
-                            <option value="copper">The Copper - Vibrant Maximalist</option>
-                            <option value="cedar">The Cedar - Rustic Chic</option>
-                        </select>
-                    </li>
                     <li class="search-item date-item">
                         <span class="search-label">Check-in</span>
                         <input type="text" id="check-in" placeholder="Check In">
@@ -942,27 +939,18 @@
     <script>
         // Search functionality
         function searchAvailability() {
-            const location = document.getElementById('search-location').value;
             const checkIn = document.getElementById('check-in').value;
             const checkOut = document.getElementById('check-out').value;
 
-            if (!location || !checkIn || !checkOut) {
+            if (!checkIn || !checkOut) {
                 return;
             }
-
-            const propertyPages = {
-                stone: 'property-stone.html',
-                copper: 'property-copper.html',
-                cedar: 'property-cedar.html'
-            };
-
-            const targetPage = propertyPages[location] || 'properties.html';
             const params = new URLSearchParams({
-                checkin: checkIn,
-                checkout: checkOut
+                checkIn: checkIn,
+                checkOut: checkOut
             });
 
-            window.location.href = `${targetPage}?${params.toString()}`;
+            window.location.href = `properties.html?${params.toString()}`;
         }
 
         // Set minimum date for check-in to today

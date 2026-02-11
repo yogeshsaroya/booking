@@ -376,6 +376,51 @@ function filterProperties() {
 }
 
 /**
+ * Apply date filters from URL params on properties page
+ */
+function applyFiltersFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const checkInParam = params.get('checkIn') || params.get('checkin');
+    const checkOutParam = params.get('checkOut') || params.get('checkout');
+
+    if (!checkInParam || !checkOutParam) {
+        return;
+    }
+
+    const checkInInput = document.getElementById('checkIn');
+    const checkOutInput = document.getElementById('checkOut');
+
+    if (!checkInInput || !checkOutInput) {
+        return;
+    }
+
+    checkInInput.value = checkInParam;
+    checkOutInput.value = checkOutParam;
+    checkOutInput.min = checkInParam;
+
+    const maxAttempts = 30;
+    let attempts = 0;
+
+    const tryFilter = () => {
+        attempts += 1;
+        if (window.calendarManager && window.calendarManager.loaded) {
+            const allLoaded = Object.values(window.calendarManager.loaded).every(Boolean);
+            if (allLoaded || attempts >= maxAttempts) {
+                filterProperties();
+                return;
+            }
+        } else if (attempts >= maxAttempts) {
+            filterProperties();
+            return;
+        }
+
+        setTimeout(tryFilter, 200);
+    };
+
+    tryFilter();
+}
+
+/**
  * Add real-time filtering on date input change
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -418,6 +463,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (noPropertiesMessage) {
         noPropertiesMessage.style.display = 'block';
     }
+
+    applyFiltersFromUrl();
 });
 
 /**
