@@ -485,9 +485,10 @@
                 width: 100%;
             }
 
-            .search-item input {
+            .search-item input,
+            .search-item select {
                 text-align: center;
-                font-size: 16px;
+                font-size: 16px !important;
             }
         }
 
@@ -644,7 +645,7 @@
     <nav class="nav">
         <div class="nav-container">
             <a href="index.html" class="logo">
-                <img src="https://smartstayz.com/cdn/images/SmartStayz-Logo.png" alt="SmartStayz">
+                <img src="https://smartstayz.com/cdn/images/SmartStayz-Logo.png" alt="SmartStayz" decoding="async">
             </a>
             <ul class="nav-menu">
                 <li><a href="properties.html">Properties</a></li>
@@ -663,14 +664,14 @@
     <!-- Hero Section with Search and Video Background -->
     <section class="hero-home">
         <!-- Background Video -->
-        <video class="hero-video-bg" autoplay muted loop playsinline>
+        <video class="hero-video-bg" autoplay muted loop playsinline preload="metadata">
             <source src="https://smartstayz.com/v/Tampa-city.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
 
         <div class="hero-home-content">
             <h1>
-                <img class="hero-home-title-img" src="https://smartstayz.com/files/Stay-Smart-Img.png" alt="Stay Smart">
+                <img class="hero-home-title-img" src="https://smartstayz.com/files/Stay-Smart-Img.png" alt="Stay Smart" decoding="async" fetchpriority="high">
             </h1>
             <p class="hero-home-subtitle">
                 Handcrafted design. Unforgettable stays. Amazing Value.
@@ -709,7 +710,7 @@
             <div class="property-showcase">
                 <a href="property-stone.html" class="showcase-card">
                     <img src="https://a0.muscache.com/im/pictures/miso/Hosting-42680597/original/6524c711-272c-43b6-b221-62fc77515e90.jpeg?im_w=720"
-                        alt="The Stone - Urban-Industrial">
+                        alt="The Stone - Urban-Industrial" loading="lazy" decoding="async" fetchpriority="low">
                     <div class="showcase-info">
                         <h3 class="showcase-title">Urban-Industrial</h3>
                         <p class="showcase-subtitle">The Stone</p>
@@ -718,7 +719,7 @@
 
                 <a href="property-copper.html" class="showcase-card">
                     <img src="https://a0.muscache.com/im/pictures/016adea6-85d0-4ae9-99ea-6e15d9390605.jpg?im_w=720"
-                        alt="The Copper - Vibrant Maximalist">
+                        alt="The Copper - Vibrant Maximalist" loading="lazy" decoding="async" fetchpriority="low">
                     <div class="showcase-info">
                         <h3 class="showcase-title">Vibrant Maximalist</h3>
                         <p class="showcase-subtitle">The Copper</p>
@@ -727,7 +728,7 @@
 
                 <a href="property-cedar.html" class="showcase-card">
                     <img src="https://a0.muscache.com/im/pictures/miso/Hosting-40961787/original/f7b22195-73c0-4b4e-b40e-4b4c4432f8ec.jpeg?im_w=720"
-                        alt="The Cedar - Rustic-Chic">
+                        alt="The Cedar - Rustic-Chic" loading="lazy" decoding="async" fetchpriority="low">
                     <div class="showcase-info">
                         <h3 class="showcase-title">Rustic-Chic</h3>
                         <p class="showcase-subtitle">The Cedar</p>
