@@ -291,12 +291,25 @@
 .calendar-day.selected {
     background: var(--copper-accent);
     color: var(--warm-white);
-    border-color: var(--copper-accent);
+    border: none;
+}
+
+.calendar-day.selected.check-in {
+    background: linear-gradient(135deg, var(--warm-white) 0 50%, var(--copper-accent) 50% 100%);
+    color: var(--charcoal);
+    border: none;
+}
+
+.calendar-day.selected.check-out {
+    background: linear-gradient(315deg, var(--warm-white) 0 50%, var(--copper-accent) 50% 100%);
+    color: var(--charcoal);
+    border: none;
 }
 
 .calendar-day.in-range {
-    background: rgba(166, 115, 82, 0.2);
-    border-color: var(--copper-accent);
+    background: var(--copper-accent);
+    color: var(--warm-white);
+    border: none;
 }
 
 .calendar-legend {

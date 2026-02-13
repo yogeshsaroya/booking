@@ -268,8 +268,8 @@ CalendarManager.prototype.renderCalendar = function(propertyId) {
     // Get selected date range for this property
     const selectedCheckIn = this.selectedDates[propertyId]?.checkIn;
     const selectedCheckOut = this.selectedDates[propertyId]?.checkOut;
-    const checkInDate = selectedCheckIn ? new Date(selectedCheckIn) : null;
-    const checkOutDate = selectedCheckOut ? new Date(selectedCheckOut) : null;
+    const checkInDate = parseDateLocal(selectedCheckIn);
+    const checkOutDate = parseDateLocal(selectedCheckOut);
     
     for (let day = 1; day <= daysInMonth; day++) {
         const currentDate = new Date(year, monthIndex, day);
@@ -291,17 +291,13 @@ CalendarManager.prototype.renderCalendar = function(propertyId) {
             const currentTime = currentDate.getTime();
             const checkInTime = checkInDate.getTime();
             const checkOutTime = checkOutDate.getTime();
-            
-            if (currentTime >= checkInTime && currentTime <= checkOutTime) {
-                dayClass += ' selected';
-                
-                // Add special classes for check-in and check-out dates
-                if (currentTime === checkInTime) {
-                    dayClass += ' check-in';
-                }
-                if (currentTime === checkOutTime) {
-                    dayClass += ' check-out';
-                }
+
+            if (currentTime === checkInTime) {
+                dayClass += ' selected check-in';
+            } else if (currentTime === checkOutTime) {
+                dayClass += ' selected check-out';
+            } else if (currentTime > checkInTime && currentTime < checkOutTime) {
+                dayClass += ' in-range';
             }
         }
         
@@ -377,6 +373,20 @@ function isDateBlocked(propertyId, dateString) {
  */
 function formatDate(date) {
     return calendarManager.formatDate(date);
+}
+
+/**
+ * Parse YYYY-MM-DD in local time
+ */
+function parseDateLocal(dateString) {
+    if (!dateString) {
+        return null;
+    }
+    const [year, month, day] = dateString.split('-').map(Number);
+    if (!year || !month || !day) {
+        return null;
+    }
+    return new Date(year, month - 1, day);
 }
 
 /**
@@ -462,7 +472,7 @@ function updateCalendarSelection(propertyId) {
     
     // Remove all selection classes
     days.forEach(day => {
-        day.classList.remove('selected', 'in-range');
+        day.classList.remove('selected', 'in-range', 'check-in', 'check-out');
     });
     
     // Update message and button
@@ -494,22 +504,23 @@ function updateCalendarSelection(propertyId) {
         return;
     }
     
-    // Highlight check-in
+    // Highlight check-in/check-out and in-range days
+    const checkInDate = parseDateLocal(dates.checkIn);
+    const checkOutDate = parseDateLocal(dates.checkOut);
+
     days.forEach(day => {
         if (day.dataset.date === dates.checkIn) {
-            day.classList.add('selected');
+            day.classList.add('selected', 'check-in');
         }
-        
-        // Highlight range if check-out is selected
+
         if (dates.checkOut) {
-            const dayDate = new Date(day.dataset.date);
-            const checkIn = new Date(dates.checkIn);
-            const checkOut = new Date(dates.checkOut);
-            
-            if (dayDate > checkIn && dayDate < checkOut) {
-                day.classList.add('in-range');
-            } else if (day.dataset.date === dates.checkOut) {
-                day.classList.add('selected');
+            const dayDate = parseDateLocal(day.dataset.date);
+            if (dayDate && checkInDate && checkOutDate) {
+                if (dayDate > checkInDate && dayDate < checkOutDate) {
+                    day.classList.add('in-range');
+                } else if (day.dataset.date === dates.checkOut) {
+                    day.classList.add('selected', 'check-out');
+                }
             }
         }
     });

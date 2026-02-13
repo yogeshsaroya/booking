@@ -7,6 +7,7 @@
     <meta name="description" content="Browse our three boutique Hyde Park vacation rentals. Check availability and book your perfect Tampa stay.">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/calendar.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -37,6 +38,19 @@
             margin: 0;
             color: #d32f2f;
             font-weight: 500;
+        }
+
+        .flatpickr-day.checkin-highlight {
+            background: #9FC2C3;
+            color: #1b1b1b;
+            border-color: transparent;
+        }
+
+        .flatpickr-day.checkin-highlight.flatpickr-disabled {
+            opacity: 1;
+            background: #9FC2C3;
+            color: #1b1b1b;
+            border-color: transparent;
         }
     </style>
 </head>
@@ -75,11 +89,11 @@
             <div class="filters">
                 <div class="filter-group">
                     <label for="checkIn">Check-in</label>
-                    <input type="date" id="checkIn" name="checkIn">
+                    <input type="text" id="checkIn" name="checkIn" placeholder="YYYY-MM-DD">
                 </div>
                 <div class="filter-group">
                     <label for="checkOut">Check-out</label>
-                    <input type="date" id="checkOut" name="checkOut">
+                    <input type="text" id="checkOut" name="checkOut" placeholder="YYYY-MM-DD">
                 </div>
                 <div class="filter-group">
                     <label for="guests">Guests</label>
@@ -375,5 +389,73 @@
 
     <script src="js/main.js"></script>
     <script src="js/calendar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkInInput = document.getElementById('checkIn');
+            const checkOutInput = document.getElementById('checkOut');
+
+            if (!checkInInput || !checkOutInput || typeof flatpickr !== 'function') {
+                return;
+            }
+
+            let checkInSelected = null;
+
+            const checkOutPicker = flatpickr(checkOutInput, {
+                dateFormat: 'Y-m-d',
+                minDate: 'today',
+                disableMobile: true,
+                disable: [],
+                onDayCreate: (_dObj, _dStr, _fp, dayElem) => {
+                    if (!checkInSelected) {
+                        return;
+                    }
+                    const isCheckInDay = dayElem.dateObj.toDateString() === checkInSelected.toDateString();
+                    if (isCheckInDay) {
+                        dayElem.classList.add('checkin-highlight');
+                    }
+                }
+            });
+
+            const checkInPicker = flatpickr(checkInInput, {
+                dateFormat: 'Y-m-d',
+                minDate: 'today',
+                disableMobile: true,
+                onChange: (selectedDates) => {
+                    if (!selectedDates.length) {
+                        checkInSelected = null;
+                        checkOutPicker.set('minDate', 'today');
+                        checkOutPicker.set('disable', []);
+                        checkOutPicker.clear();
+                        checkOutPicker.redraw();
+                        return;
+                    }
+
+                    checkInSelected = selectedDates[0];
+                    const minCheckOut = new Date(checkInSelected);
+                    minCheckOut.setDate(minCheckOut.getDate() + 1);
+                    checkOutPicker.set('minDate', minCheckOut);
+                    checkOutPicker.set('disable', [checkInSelected]);
+                    checkOutPicker.redraw();
+
+                    const selectedCheckOut = checkOutPicker.selectedDates[0];
+                    if (selectedCheckOut && selectedCheckOut < minCheckOut) {
+                        checkOutPicker.clear();
+                    }
+                }
+            });
+
+            const initialCheckIn = checkInInput.value;
+            const initialCheckOut = checkOutInput.value;
+
+            if (initialCheckIn) {
+                checkInPicker.setDate(initialCheckIn, true);
+            }
+
+            if (initialCheckOut) {
+                checkOutPicker.setDate(initialCheckOut, true);
+            }
+        });
+    </script>
 </body>
 </html>

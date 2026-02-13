@@ -8,6 +8,7 @@
     <meta name="description"
         content="Discover unique boutique vacation rentals in Tampa's Hyde Park. Handcrafted spaces with style, premium amenities, and unbeatable location.">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -217,6 +218,19 @@
         .search-btn:hover {
             color: white;
             transform: translateY(-1px);
+        }
+
+        .flatpickr-day.checkin-highlight {
+            background: #9FC2C3;
+            color: #1b1b1b;
+            border-color: transparent;
+        }
+
+        .flatpickr-day.checkin-highlight.flatpickr-disabled {
+            opacity: 1;
+            background: #9FC2C3;
+            color: #1b1b1b;
+            border-color: transparent;
         }
 
         .hero-cta {
@@ -936,6 +950,7 @@
     </footer>
 
     <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         // Search functionality
         function searchAvailability() {
@@ -953,71 +968,55 @@
             window.location.href = `properties.html?${params.toString()}`;
         }
 
-        // Set minimum date for check-in to today
-        const today = new Date().toISOString().split('T')[0];
         const checkInInput = document.getElementById('check-in');
         const checkOutInput = document.getElementById('check-out');
-        if (checkInInput) {
-            checkInInput.setAttribute('min', today);
-        }
+        if (checkInInput && checkOutInput && typeof flatpickr === 'function') {
+            let checkInSelected = null;
 
-        // Update check-out minimum date when check-in changes
-        if (checkInInput && checkOutInput) {
-            checkInInput.addEventListener('change', function() {
-                const checkInDate = new Date(this.value);
-                if (Number.isNaN(checkInDate.getTime())) {
-                    return;
+            const checkOutPicker = flatpickr(checkOutInput, {
+                dateFormat: 'Y-m-d',
+                minDate: 'today',
+                disableMobile: true,
+                disable: [],
+                onDayCreate: (_dObj, _dStr, _fp, dayElem) => {
+                    if (!checkInSelected) {
+                        return;
+                    }
+                    const isCheckInDay = dayElem.dateObj.toDateString() === checkInSelected.toDateString();
+                    if (isCheckInDay) {
+                        dayElem.classList.add('checkin-highlight');
+                    }
                 }
-                const nextDay = new Date(checkInDate);
-                nextDay.setDate(checkInDate.getDate() + 1);
-                const minCheckOut = nextDay.toISOString().split('T')[0];
-                checkOutInput.setAttribute('min', minCheckOut);
-                if (checkOutInput.value && checkOutInput.value < minCheckOut) {
-                    checkOutInput.value = '';
+            });
+
+            flatpickr(checkInInput, {
+                dateFormat: 'Y-m-d',
+                minDate: 'today',
+                disableMobile: true,
+                onChange: (selectedDates) => {
+                    if (!selectedDates.length) {
+                        checkInSelected = null;
+                        checkOutPicker.set('minDate', 'today');
+                        checkOutPicker.set('disable', []);
+                        checkOutPicker.clear();
+                        checkOutPicker.redraw();
+                        return;
+                    }
+
+                    checkInSelected = selectedDates[0];
+                    const minCheckOut = new Date(checkInSelected);
+                    minCheckOut.setDate(minCheckOut.getDate() + 1);
+                    checkOutPicker.set('minDate', minCheckOut);
+                    checkOutPicker.set('disable', [checkInSelected]);
+                    checkOutPicker.redraw();
+
+                    const selectedCheckOut = checkOutPicker.selectedDates[0];
+                    if (selectedCheckOut && selectedCheckOut < minCheckOut) {
+                        checkOutPicker.clear();
+                    }
                 }
             });
         }
-
-        // Show placeholders and open calendar on focus/click
-        function setupDateInput(input, placeholder) {
-            if (!input) {
-                return;
-            }
-
-            const setToText = () => {
-                if (!input.value) {
-                    input.type = 'text';
-                    input.placeholder = placeholder;
-                }
-            };
-
-            const setToDate = () => {
-                input.type = 'date';
-            };
-
-            setToText();
-
-            input.addEventListener('focus', () => {
-                setToDate();
-                if (typeof input.showPicker === 'function') {
-                    input.showPicker();
-                }
-            });
-
-            input.addEventListener('click', () => {
-                setToDate();
-                if (typeof input.showPicker === 'function') {
-                    input.showPicker();
-                }
-            });
-
-            input.addEventListener('blur', () => {
-                setToText();
-            });
-        }
-
-        setupDateInput(checkInInput, 'Check In');
-        setupDateInput(checkOutInput, 'Check Out');
     </script>
 </body>
 
