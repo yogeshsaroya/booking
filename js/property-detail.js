@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlCheckOut = urlParams.get('checkOut') || urlParams.get('checkout');
 
     if ((urlCheckIn && !urlCheckOut) || (!urlCheckIn && urlCheckOut)) {
-        window.location.replace('home2.html');
+        window.location.replace('index.html');
         return;
     }
 
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const checkOutDate = new Date(urlCheckOut);
 
         if (Number.isNaN(checkInDate.getTime()) || Number.isNaN(checkOutDate.getTime()) || checkOutDate <= checkInDate) {
-            window.location.replace('home2.html');
+            window.location.replace('index.html');
             return;
         }
     }
